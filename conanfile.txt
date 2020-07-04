@@ -1,0 +1,7 @@
+[requires]
+cpp-httplib/0.6.6
+nlohmann_json/3.8.0
+gtest/1.8.1
+
+[generators]
+cmake
