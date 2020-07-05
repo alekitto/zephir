@@ -2,6 +2,9 @@
 #include "../../../libzephir/identity/Subject.hpp"
 #include "../../../libzephir/EmptyPolicy.hpp"
 
+using namespace libzephir;
+using namespace libzephir::identity;
+
 class ConcreteSubject : public Subject {
 public:
     explicit ConcreteSubject(const Policy & policy): Subject(policy) {}

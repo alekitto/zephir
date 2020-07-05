@@ -2,6 +2,9 @@
 #include "../../../libzephir/identity/Group.hpp"
 #include "../../../libzephir/EmptyPolicy.hpp"
 
+using namespace libzephir;
+using namespace libzephir::identity;
+
 TEST(GroupTest, CanBeCreated) {
     Group g = Group("Group", EmptyPolicy());
     ASSERT_EQ(0, g.getIdentities().size());

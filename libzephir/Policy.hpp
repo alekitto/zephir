@@ -7,77 +7,83 @@
 #include "MatchResult.hpp"
 #include "PartialPolicy.hpp"
 
-class Policy : public PartialPolicy {
-    friend class Compiler;
+namespace libzephir {
+    using namespace compiler;
 
-    std::string _id;
-    std::shared_ptr<CompiledPolicy> _compiled;
+    class Policy : public PartialPolicy {
+        friend class compiler::Compiler;
 
-    void compile();
-    void compile(Compiler & compiler);
+        std::string _id;
+        std::shared_ptr<CompiledPolicy> _compiled;
 
-public:
-    const PolicyVersion& version;
-    const PolicyEffect& effect;
-    const std::string& id;
+        void compile();
 
-    Policy& operator= (Policy p) {
-        using namespace std;
-        swap(_version, p._version);
-        swap(_id, p._id);
-        swap(_effect, p._effect);
-        swap(_actions, p._actions);
-        swap(_resources, p._resources);
+        void compile(Compiler &compiler);
 
-        _compiled = nullptr;
+    public:
+        const PolicyVersion &version;
+        const PolicyEffect &effect;
+        const std::string &id;
 
-        return *this;
-    }
+        Policy &operator=(Policy p) {
+            using namespace std;
 
-    Policy(const Policy& p):
-        PartialPolicy(p._version, p._effect, std::make_optional(p._actions.value()), std::make_optional(p._resources.value())),
-        _id(p._id),
-        _compiled(nullptr),
-        effect(_effect),
-        id(_id),
-        version(_version) {
-    }
+            swap(_version, p._version);
+            swap(_id, p._id);
+            swap(_effect, p._effect);
+            swap(_actions, p._actions);
+            swap(_resources, p._resources);
+            _compiled = nullptr;
 
-    Policy(PolicyVersion pVersion, std::string pId, PolicyEffect effect, string_vector actions, string_vector resources = {}) :
-        PartialPolicy(pVersion, effect, std::make_optional(std::move(actions)), std::make_optional(std::move(resources))),
-        _id(pId),
-        _compiled(nullptr),
-        effect(_effect),
-        version(_version),
-        id(_id)
-    {
-        if (this->_actions.value().empty()) {
-            throw ActionsCannotBeEmptyException();
+            return *this;
         }
 
-        if (this->_resources.value().empty()) {
-            this->_resources.value().push_back("*");
+        Policy(const Policy &p) :
+            PartialPolicy(p._version, p._effect, std::make_optional(p._actions.value()), std::make_optional(p._resources.value())),
+            _id(p._id),
+            _compiled(nullptr),
+            effect(_effect),
+            id(_id),
+            version(_version) { }
+
+        Policy(PolicyVersion pVersion, std::string pId, PolicyEffect effect, string_vector actions, string_vector resources = {}) :
+            PartialPolicy(pVersion, effect, std::make_optional(std::move(actions)), std::make_optional(std::move(resources))),
+            _id(pId),
+            _compiled(nullptr),
+            effect(_effect),
+            version(_version),
+            id(_id)
+        {
+            if (this->_actions.value().empty()) {
+                throw exception::ActionsCannotBeEmptyException();
+            }
+
+            if (this->_resources.value().empty()) {
+                this->_resources.value().push_back("*");
+            }
         }
-    }
 
-    virtual std::unique_ptr<MatchResult> match(std::string& action, std::string& resource);
-    virtual std::unique_ptr<MatchResult> match(const std::optional<std::string>& action, const std::optional<std::string>& resource);
+        virtual std::unique_ptr<MatchResult> match(std::string &action, std::string &resource);
 
-    bool complete() override { return true; }
-    std::string toJson() override
-    {
-        using namespace nlohmann;
+        virtual std::unique_ptr<MatchResult>
+        match(const std::optional<std::string> &action, const std::optional<std::string> &resource);
 
-        json j = {
-            {"version", (int) this->_version},
-            {"id", this->_id},
-            {"effect",  this->_effect == ALLOW ? "Allow" : "Deny"},
-            {"actions", this->_actions.value()},
-            {"resources", this->_resources.value()}
-        };
+        bool complete() override { return true; }
 
-        return j.dump();
-    }
-};
+        std::string toJson() override {
+            using namespace nlohmann;
+
+            json j = {
+                    {"version",   (int) this->_version},
+                    {"id",        this->_id},
+                    {"effect",    this->_effect == ALLOW ? "Allow" : "Deny"},
+                    {"actions",   this->_actions.value()},
+                    {"resources", this->_resources.value()}
+            };
+
+            return j.dump();
+        }
+    };
+}
 
 #endif //ZEPHIR_POLICY_HPP

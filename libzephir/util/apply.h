@@ -3,7 +3,7 @@
 
 #include <vector>
 
-namespace util {
+namespace libzephir::util {
     template<typename C, typename F>
     auto apply(C &&container, F &&func) {
         using std::begin;

@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 #include "../../../libzephir/identity/Role.hpp"
 
+using namespace libzephir;
+using namespace libzephir::identity;
+
 class ConcreteRole : public Role {
 public:
     ConcreteRole(): Role() {}

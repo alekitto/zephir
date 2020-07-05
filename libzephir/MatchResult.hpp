@@ -5,38 +5,41 @@
 #include <optional>
 #include "PartialPolicy.hpp"
 
-class Policy;
-enum ResultType {
-    PARTIAL,
-    FULL,
-};
+namespace libzephir {
+    class Policy;
 
-enum ResultOutcome {
-    MATCH = 0,
-    NOT_MATCH = 1,
-};
+    enum ResultType {
+        PARTIAL,
+        FULL,
+    };
 
-class MatchResult {
-    ResultType _type = PARTIAL;
-    ResultOutcome _outcome = NOT_MATCH;
+    enum ResultOutcome {
+        MATCH = 0,
+        NOT_MATCH = 1,
+    };
 
-    Policy &m_policy;
-    std::unique_ptr<PartialPolicy> m_partial = nullptr;
+    class MatchResult {
+        ResultType _type = PARTIAL;
+        ResultOutcome _outcome = NOT_MATCH;
 
-    std::optional<bool> m_action;
-    std::optional<bool> m_resource;
+        Policy &m_policy;
+        std::unique_ptr<PartialPolicy> m_partial = nullptr;
 
-public:
-    const ResultOutcome &outcome;
-    const ResultType &type;
+        std::optional<bool> m_action;
+        std::optional<bool> m_resource;
 
-    explicit MatchResult(Policy &p) : outcome(this->_outcome), type(this->_type), m_policy(p) {}
+    public:
+        const ResultOutcome &outcome;
+        const ResultType &type;
 
-    void action(bool r) { m_action = r; }
-    void resource(bool r) { m_resource = r; }
-    void _update();
+        explicit MatchResult(Policy &p) : outcome(this->_outcome), type(this->_type), m_policy(p) {}
 
-    std::unique_ptr<PartialPolicy>& getPartial() { return m_partial; }
-};
+        void action(bool r) { m_action = r; }
+        void resource(bool r) { m_resource = r; }
+        std::unique_ptr<PartialPolicy> &getPartial() { return m_partial; }
+
+        void _update();
+    };
+}
 
 #endif //ZEPHIR_MATCHRESULT_HPP

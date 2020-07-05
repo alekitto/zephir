@@ -1,7 +1,7 @@
 #include <string>
 #include <regex>
 
-namespace util {
+namespace libzephir::util {
     // Returns a RegExp which is the equivalent of the glob pattern.
     std::regex glob_to_regex(std::string glob) {
         if ("*" == glob) {

@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 #include "../../libzephir/Policy.hpp"
 
+using namespace libzephir;
+using namespace libzephir::exception;
+
 TEST(PolicyTest, CanBeCreated) {
     Policy p = Policy(VERSION_1, "TestPolicy", ALLOW, { "*" });
     ASSERT_EQ(ALLOW, p.effect);
