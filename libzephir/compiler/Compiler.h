@@ -13,8 +13,8 @@ namespace libzephir {
 
     namespace compiler {
         class Compiler {
-            LruCache<std::string, std::shared_ptr<CompiledPolicy>> _cache = LruCache<std::string, std::shared_ptr<CompiledPolicy>>(
-                    1000);
+            typedef cache::LruCache<std::string, std::shared_ptr<CompiledPolicy>> CompilerPolicyCache;
+            CompilerPolicyCache _cache = CompilerPolicyCache(1000);
 
         public:
             std::shared_ptr<CompiledPolicy> compile(Policy &policy);

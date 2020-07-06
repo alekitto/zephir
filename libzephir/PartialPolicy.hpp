@@ -21,7 +21,6 @@ namespace libzephir {
 
     class PartialPolicy {
         friend class Compiler;
-
         friend class MatchResult;
 
     protected:
@@ -33,9 +32,23 @@ namespace libzephir {
         // TODO: conditions
 
     public:
+        const PolicyEffect& effect;
+
+        PartialPolicy &operator=(PartialPolicy p) {
+            using namespace std;
+
+            swap(_version, p._version);
+            swap(_effect, p._effect);
+            swap(_actions, p._actions);
+            swap(_resources, p._resources);
+
+            return *this;
+        }
+
         PartialPolicy(const PartialPolicy &p) :
             _version(p._version),
             _effect(p._effect),
+            effect(_effect),
             _actions(p._actions.has_value() ? std::make_optional(p._actions.value()) : std::nullopt),
             _resources(p._resources.has_value() ? std::make_optional(p._resources.value()) : std::nullopt) {}
 
@@ -46,14 +59,14 @@ namespace libzephir {
             : PartialPolicy(pVersion, pEffect, actions, std::nullopt) {}
 
         PartialPolicy(PolicyVersion pVersion, PolicyEffect pEffect, std::optional<string_vector> actions, std::optional<string_vector> resources) :
+            _effect(pEffect),
+            effect(_effect),
             _actions(std::move(actions)),
             _resources(std::move(resources))
         {
             if (pVersion != VERSION_1) {
                 throw exception::UnknownPolicyVersionException((int) pVersion);
             }
-
-            this->_effect = pEffect;
         }
 
         virtual bool complete() { return false; }

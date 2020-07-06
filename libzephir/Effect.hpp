@@ -3,8 +3,8 @@
 
 namespace libzephir {
     enum PolicyEffect {
-        ALLOW,
-        DENY,
+        DENY = 0,
+        ALLOW = 1,
     };
 }
 

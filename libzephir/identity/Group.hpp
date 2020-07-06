@@ -11,9 +11,12 @@ namespace libzephir::identity {
         std::vector<std::shared_ptr<Identity>> m_identities;
 
     public:
+        const std::string &name;
+
         Group(std::string name, const Policy &policy) :
             Subject(policy),
             m_name(std::move(name)),
+            name(m_name),
             m_identities({}) {}
 
         const std::vector<std::shared_ptr<Identity>> &

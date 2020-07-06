@@ -22,17 +22,13 @@ namespace libzephir {
 
     public:
         const PolicyVersion &version;
-        const PolicyEffect &effect;
         const std::string &id;
 
         Policy &operator=(Policy p) {
             using namespace std;
 
-            swap(_version, p._version);
+            PartialPolicy::operator= (p);
             swap(_id, p._id);
-            swap(_effect, p._effect);
-            swap(_actions, p._actions);
-            swap(_resources, p._resources);
             _compiled = nullptr;
 
             return *this;
@@ -42,15 +38,13 @@ namespace libzephir {
             PartialPolicy(p._version, p._effect, std::make_optional(p._actions.value()), std::make_optional(p._resources.value())),
             _id(p._id),
             _compiled(nullptr),
-            effect(_effect),
             id(_id),
             version(_version) { }
 
         Policy(PolicyVersion pVersion, std::string pId, PolicyEffect effect, string_vector actions, string_vector resources = {}) :
             PartialPolicy(pVersion, effect, std::make_optional(std::move(actions)), std::make_optional(std::move(resources))),
-            _id(pId),
+            _id(std::move(pId)),
             _compiled(nullptr),
-            effect(_effect),
             version(_version),
             id(_id)
         {
@@ -74,11 +68,11 @@ namespace libzephir {
             using namespace nlohmann;
 
             json j = {
-                    {"version",   (int) this->_version},
-                    {"id",        this->_id},
-                    {"effect",    this->_effect == ALLOW ? "Allow" : "Deny"},
-                    {"actions",   this->_actions.value()},
-                    {"resources", this->_resources.value()}
+                {"version",   (int) this->_version},
+                {"id",        this->_id},
+                {"effect",    this->_effect == ALLOW ? "Allow" : "Deny"},
+                {"actions",   this->_actions.value()},
+                {"resources", this->_resources.value()}
             };
 
             return j.dump();

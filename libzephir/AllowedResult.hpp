@@ -26,6 +26,48 @@ namespace libzephir {
             _partials(partials),
             outcome(_outcome),
             partials(_partials) {}
+
+        std::string toJson() {
+            using namespace nlohmann;
+
+            std::vector<std::string> partialsJson;
+            for (auto & partial : this->_partials) {
+                partialsJson.push_back(partial.toJson());
+            }
+
+            json j = {
+                {"outcome", this->_outcome == ALLOWED ? "Allowed" : this->_outcome == ABSTAIN ? "Abstain" : "Denied"},
+                {"partials", partialsJson}
+            };
+
+            return j.dump();
+        }
+
+        void merge(const AllowedResult & other) {
+            if (other._outcome == DENIED) {
+                this->_outcome = DENIED;
+                this->_partials = {};
+                return;
+            }
+
+            if (this->_outcome != ABSTAIN) {
+                return;
+            }
+
+            if (other._outcome == ALLOWED) {
+                this->_outcome = ALLOWED;
+            }
+
+            this->_partials.insert(this->_partials.end(), std::begin(other._partials), std::end(other._partials));
+            if (this->_outcome == ALLOWED) {
+                this->_partials.erase(
+                    std::remove_if(std::begin(this->_partials), std::end(this->_partials), [](const PartialPolicy & policy) {
+                        return policy.effect != DENY;
+                    }),
+                    std::end(this->_partials)
+                );
+            }
+        }
     };
 }
 

@@ -2,6 +2,9 @@
 cpp-httplib/0.6.6
 nlohmann_json/3.8.0
 gtest/1.8.1
+sqlpp11/0.59
+libpq/12.2
+uriparser/0.9.4
 
 [generators]
 cmake
