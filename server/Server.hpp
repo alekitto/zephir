@@ -92,6 +92,7 @@ namespace zephir::server {
                 res.status = result.outcome == libzephir::DENIED ? 403 : 200;
             });
 
+            std::cout << "Listening on port 8091" << std::endl;
             srv.listen("0.0.0.0", 8091);
         }
     };

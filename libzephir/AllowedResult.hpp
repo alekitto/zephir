@@ -35,8 +35,13 @@ namespace libzephir {
                 partialsJson.push_back(partial.toJson());
             }
 
+            auto rOutcome = this->_outcome;
+            if (ABSTAIN == rOutcome && this->partials.size() == 0) {
+                rOutcome = DENIED;
+            }
+
             json j = {
-                {"outcome", this->_outcome == ALLOWED ? "Allowed" : this->_outcome == ABSTAIN ? "Abstain" : "Denied"},
+                {"outcome", rOutcome == ALLOWED ? "Allowed" : rOutcome == ABSTAIN ? "Abstain" : "Denied"},
                 {"partials", partialsJson}
             };
 
