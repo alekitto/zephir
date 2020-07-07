@@ -5,6 +5,7 @@ gtest/1.8.1
 sqlpp11/0.59
 libpq/12.2
 uriparser/0.9.4
+yaml-cpp/0.6.3
 
 [generators]
 cmake

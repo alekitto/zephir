@@ -7,5 +7,7 @@ namespace libzephir::storage {
         if (std::string::npos != dsn.rfind("postgres", 0)) {
             return std::make_shared<sql::postgres::PostgresManager>(dsn);
         }
+
+        throw ::libzephir::exception::UnsupportedStorageDsn();
     }
 }
