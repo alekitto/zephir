@@ -63,20 +63,17 @@ namespace libzephir {
         virtual std::unique_ptr<MatchResult>
         match(const std::optional<std::string> &action, const std::optional<std::string> &resource);
 
+        bool complete() const override { return true; }
         bool complete() override { return true; }
 
-        std::string toJson() override {
-            using namespace nlohmann;
-
-            json j = {
+        nlohmann::json toJson() override {
+            return nlohmann::json{
                 {"version",   (int) this->_version},
                 {"id",        this->_id},
                 {"effect",    this->_effect == ALLOW ? "ALLOW" : "DENY"},
                 {"actions",   this->_actions.value()},
                 {"resources", this->_resources.value()}
             };
-
-            return j.dump();
         }
     };
 }

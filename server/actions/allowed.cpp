@@ -35,7 +35,7 @@ namespace zephir::server {
             }
         }
 
-        res.set_content(result.toJson(), "application/json");
+        res.set_content(result.toJsonString(), "application/json");
         res.status = result.outcome == libzephir::DENIED ? 403 : 200;
     }
 }

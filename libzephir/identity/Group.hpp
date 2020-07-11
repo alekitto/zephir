@@ -12,7 +12,7 @@ namespace libzephir::identity {
     public:
         const std::string &name;
 
-        Group(std::string name, const Policy &policy) :
+        Group(std::string name, std::shared_ptr<Policy> policy) :
             Subject(policy),
             m_name(std::move(name)),
             name(m_name),
@@ -42,6 +42,25 @@ namespace libzephir::identity {
                     remove_if(begin(m_identities), end(m_identities), l),
                     end(m_identities)
             );
+        }
+
+        nlohmann::json toJson() override {
+            std::vector<std::string> identities;
+            for (auto & i : this->m_identities) {
+                identities.push_back(i->id);
+            }
+
+            std::vector<std::string> policies;
+            for (auto & p : this->linkedPolicies()) {
+                policies.push_back(p->id);
+            }
+
+            return nlohmann::json{
+                {"id",              this->m_name},
+                {"members",         identities},
+                {"inline_policy",   this->inlinePolicy->toJson()},
+                {"linked_policies", policies},
+            };
         }
     };
 }

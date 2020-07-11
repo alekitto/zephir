@@ -28,6 +28,7 @@ namespace libzephir::storage::sql::postgres {
 
         std::vector<std::shared_ptr<Group>> getGroupsFor(const Identity &target) override;
 
+        void save(const Identity &i) override;
         void save(const Policy &p) override;
 
     protected:

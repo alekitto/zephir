@@ -88,7 +88,7 @@ std::shared_ptr<Group> PostgresManager::_findGroup(const std::string &id) {
     auto & row = rows.front();
     auto embeddedPolicy = row.policy_id.is_null() ? std::make_shared<EmptyPolicy>() : this->getPolicy(row.policy_id.value());
 
-    auto g = std::make_shared<Group>(row.id.value(), *embeddedPolicy);
+    auto g = std::make_shared<Group>(row.id.value(), embeddedPolicy);
     for (auto & pRow : this->db(
         ::sqlpp::select(groupPolicy.policy_id)
             .from(groupPolicy)
@@ -96,7 +96,7 @@ std::shared_ptr<Group> PostgresManager::_findGroup(const std::string &id) {
     )) {
         auto p = this->getPolicy(pRow.policy_id);
         if (p != nullptr) {
-            g->addPolicy(*p);
+            g->addPolicy(p);
         }
     }
 
@@ -129,7 +129,7 @@ std::shared_ptr<Identity> PostgresManager::_findIdentity(const std::string &id) 
     auto & row = rows.front();
     auto embeddedPolicy = row.policy_id.is_null() ? std::make_shared<EmptyPolicy>() : this->getPolicy(row.policy_id.value());
 
-    auto i = std::make_shared<Identity>(row.id.value(), *embeddedPolicy);
+    auto i = std::make_shared<Identity>(row.id.value(), embeddedPolicy);
     for (auto & pRow : this->db(
         ::sqlpp::select(identityPolicy.policy_id)
             .from(identityPolicy)
@@ -137,7 +137,7 @@ std::shared_ptr<Identity> PostgresManager::_findIdentity(const std::string &id) 
     )) {
         auto p = this->getPolicy(pRow.policy_id);
         if (p != nullptr) {
-            i->addPolicy(*p);
+            i->addPolicy(p);
         }
     }
 
@@ -166,6 +166,51 @@ std::shared_ptr<Policy> PostgresManager::_findPolicy(const std::string &id) {
     this->m_cache.policies.insert(p->id, p);
 
     return p;
+}
+
+void PostgresManager::save(const Identity &i) {
+    std::string embedded_policy_id = "__embedded_policy_identity_" + i.id + "__";
+    const Policy & embeddedPolicy = i.getInlinePolicy();
+
+    this->db.start_transaction();
+    auto row = this->db(::sqlpp::select(identity.id).from(identity).where(identity.id == i.id));
+    if (! row.empty()) {
+        auto update = ::sqlpp::update(identity)
+            .where(identity.id == i.id);
+
+        if (embeddedPolicy.complete()) {
+            this->db(update.set(identity.policy_id = embedded_policy_id));
+        } else {
+            this->db(update.set(identity.policy_id = ::sqlpp::null));
+        }
+    } else {
+        auto insert = ::sqlpp::insert_into(identity).columns(identity.id, identity.policy_id);
+        if (embeddedPolicy.complete()) {
+            insert.values.add(identity.id = i.id, identity.policy_id = embedded_policy_id);
+        } else {
+            insert.values.add(identity.id = i.id, identity.policy_id = ::sqlpp::null);
+        }
+
+        this->db(insert);
+    }
+
+    if (embeddedPolicy.complete()) {
+        Policy persistingPolicy(embeddedPolicy.version, embedded_policy_id, embeddedPolicy.effect,
+            embeddedPolicy.actions(), embeddedPolicy.resources());
+        this->save(persistingPolicy);
+    }
+
+    this->db(::sqlpp::remove_from(identityPolicy).where(identityPolicy.identity_id == i.id));
+    for (auto & p : i.linkedPolicies()) {
+        this->db(::sqlpp::insert_into(identityPolicy)
+            .set(identityPolicy.identity_id = i.id, identityPolicy.policy_id = p->id)
+        );
+    }
+
+    this->db.commit_transaction();
+
+    this->m_cache.identities.clear();
+    Compiler::getInstance().clearCache();
 }
 
 void PostgresManager::save(const Policy &p) {

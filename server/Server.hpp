@@ -37,6 +37,7 @@ namespace zephir::server {
             res.status = 400;
         }
 
+        void upsertIdentity(const Request &req, Response &res, const ContentReader &content_reader);
         void upsertPolicy(const Request &req, Response &res, const ContentReader &content_reader);
 
         void allowedAction(const Request &req, Response &res, const ContentReader &content_reader);
@@ -58,6 +59,9 @@ namespace zephir::server {
 
             srv.Post("/policies", [&](const Request &req, Response &res, const ContentReader &content_reader) {
                 this->upsertPolicy(req, res, content_reader);
+            });
+            srv.Post("/identities", [&](const Request &req, Response &res, const ContentReader &content_reader) {
+                this->upsertIdentity(req, res, content_reader);
             });
 
             std::cout << "Listening on port 8091" << std::endl;

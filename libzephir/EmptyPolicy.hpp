@@ -18,10 +18,11 @@ namespace libzephir {
             return result;
         }
 
-        bool complete() override { return false; }
+        [[nodiscard]] bool complete() const override { return false; }
+        [[nodiscard]] bool complete() override { return false; }
 
-        std::string toJson() override {
-            return "null";
+        nlohmann::json toJson() override {
+            return nlohmann::json(nullptr);
         }
     };
 }

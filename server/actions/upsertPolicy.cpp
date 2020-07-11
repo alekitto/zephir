@@ -22,6 +22,6 @@ namespace zephir::server {
         libzephir::Policy p(libzephir::VERSION_1, id, e, actions, resources);
         this->m_manager.save(p);
 
-        res.set_content(p.toJson(), "application/json");
+        res.set_content(p.toJsonString(), "application/json");
     }
 }

@@ -7,11 +7,11 @@
 
 namespace libzephir::identity {
     class Role {
-        std::vector<Policy> _linkedPolicies;
+        std::vector<std::shared_ptr<Policy>> _linkedPolicies;
 
     protected:
-        Role() : _linkedPolicies(std::vector<Policy>()) {}
-        explicit Role(std::vector<Policy> policies) :
+        Role() : _linkedPolicies(std::vector<std::shared_ptr<Policy>>()) {}
+        explicit Role(std::vector<std::shared_ptr<Policy>> policies) :
                 _linkedPolicies(std::move(policies)) {}
 
         std::unique_ptr<AllowedResult>
@@ -42,11 +42,12 @@ namespace libzephir::identity {
         }
 
     public:
-        std::vector<Policy> &linkedPolicies() { return this->_linkedPolicies; };
+        const std::vector<std::shared_ptr<Policy>> &linkedPolicies() const { return this->_linkedPolicies; };
+        std::vector<std::shared_ptr<Policy>> &linkedPolicies() { return this->_linkedPolicies; };
 
-        void addPolicy(Policy policy) {
+        void addPolicy(std::shared_ptr<Policy> policy) {
             using namespace std;
-            if (any_of(begin(_linkedPolicies), end(_linkedPolicies), [&policy](Policy &p) { return p.id == policy.id; })) {
+            if (any_of(begin(_linkedPolicies), end(_linkedPolicies), [&policy](std::shared_ptr<Policy> &p) { return p->id == policy->id; })) {
                 return;
             }
 
@@ -57,7 +58,7 @@ namespace libzephir::identity {
         void removePolicy(const std::string &id) {
             using namespace std;
             this->_linkedPolicies.erase(
-                remove_if(begin(_linkedPolicies), end(_linkedPolicies), [id](Policy &p) { return p.id == id; }),
+                remove_if(begin(_linkedPolicies), end(_linkedPolicies), [id](std::shared_ptr<Policy> &p) { return p->id == id; }),
                 end(_linkedPolicies)
             );
         }
@@ -65,11 +66,15 @@ namespace libzephir::identity {
         virtual std::unique_ptr<AllowedResult>
         allowed(const std::optional<std::string> &action, const std::optional<std::string> &resource) {
             std::vector<std::reference_wrapper<Policy>> policies = {};
-            for (Policy &policy : this->_linkedPolicies) {
-                policies.push_back(std::ref(policy));
+            for (std::shared_ptr<Policy> &policy : this->_linkedPolicies) {
+                policies.push_back(*policy);
             }
 
             return this->_allowed(policies, action, resource);
+        }
+
+        virtual nlohmann::json toJson() {
+            return nlohmann::json(nullptr);
         }
     };
 }

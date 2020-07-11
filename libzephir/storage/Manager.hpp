@@ -56,6 +56,7 @@ namespace libzephir {
                     .value_or(this->_findPolicy(id));
             }
 
+            virtual void save(const Identity & i) = 0;
             virtual void save(const Policy & p) = 0;
 
             virtual std::vector<std::shared_ptr<Group>> getGroupsFor(const Identity & identity) = 0;

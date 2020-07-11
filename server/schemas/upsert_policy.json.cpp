@@ -61,18 +61,6 @@ namespace zephir::json_schema::internal {
             ],
             "additionalItems": true,
             "items": {
-                "anyOf": [
-                    {
-                        "$id": "#/properties/actions/items/anyOf/0",
-                        "type": "string",
-                        "title": "The first anyOf schema",
-                        "description": "An explanation about the purpose of this instance.",
-                        "default": "",
-                        "examples": [
-                            "action1"
-                        ]
-                    }
-                ],
                 "$id": "#/properties/actions/items",
                 "type": "string"
             },
@@ -92,18 +80,6 @@ namespace zephir::json_schema::internal {
             ],
             "additionalItems": true,
             "items": {
-                "anyOf": [
-                    {
-                        "$id": "#/properties/resources/items/anyOf/0",
-                        "type": "string",
-                        "title": "The first anyOf schema",
-                        "description": "An explanation about the purpose of this instance.",
-                        "default": "",
-                        "examples": [
-                            "resource1"
-                        ]
-                    }
-                ],
                 "$id": "#/properties/resources/items",
                 "type": "string"
             },

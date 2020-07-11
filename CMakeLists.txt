@@ -17,7 +17,14 @@ conan_basic_setup()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${CONAN_INCLUDE_DIRS_NLOHMANN_JSON}/nlohmann")
 
 add_subdirectory(extern)
-add_library(libzephir STATIC libzephir/Policy.cpp libzephir/compiler/Compiler.cpp libzephir/util/util.cpp libzephir/MatchResult.cpp libzephir/storage/Manager.cpp libzephir/storage/sql/postgres/PostgresManager.cpp)
+add_library(libzephir STATIC
+    libzephir/Policy.cpp
+    libzephir/compiler/Compiler.cpp
+    libzephir/util/util.cpp
+    libzephir/MatchResult.cpp
+    libzephir/storage/Manager.cpp
+    libzephir/storage/sql/postgres/PostgresManager.cpp
+)
 set_target_properties(libzephir PROPERTIES PREFIX "")
 
 add_executable(zephir "")
@@ -26,9 +33,11 @@ target_sources(zephir PRIVATE
     server/json-reader.cpp
     server/schemas/schemas.cpp
     server/schemas/allowed.json.cpp
+    server/schemas/upsert_identity.json.cpp
     server/schemas/upsert_policy.json.cpp
     server/actions/allowed.cpp
-    server/actions/upsertPolicies.cpp
+    server/actions/upsertIdentity.cpp
+    server/actions/upsertPolicy.cpp
 )
 
 target_link_libraries(zephir libzephir "sqlpp11-connector-postgresql" ${CONAN_LIBS})

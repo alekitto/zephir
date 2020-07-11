@@ -68,14 +68,13 @@ namespace libzephir {
             }
         }
 
+        virtual bool complete() const { return false; }
         virtual bool complete() { return false; }
 
-        virtual std::string toJson() {
-            using namespace nlohmann;
-
-            json j = {
-                    {"version", (int) this->_version},
-                    {"effect",  this->_effect == ALLOW ? "Allow" : "Deny"},
+        virtual nlohmann::json toJson() {
+            nlohmann::json j = {
+                {"version", (int) this->_version},
+                {"effect",  this->_effect == ALLOW ? "Allow" : "Deny"},
             };
 
             if (this->_actions.has_value()) {
@@ -86,7 +85,11 @@ namespace libzephir {
                 j["actions"] = this->_resources.value();
             }
 
-            return j.dump();
+            return j;
+        }
+
+        virtual std::string toJsonString() {
+            return this->toJson().dump();
         }
     };
 }

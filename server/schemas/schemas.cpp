@@ -11,11 +11,13 @@
 
 namespace zephir::json_schema {
     valijson::Schema sPolicyUpsert;
+    valijson::Schema sIdentityUpsert;
     valijson::Schema sAllowed;
 
     init__schemas::init__schemas() {
         POPULATE_SCHEMA(internal::allowedSchema, sAllowed)
         POPULATE_SCHEMA(internal::upsertPolicySchema, sPolicyUpsert)
+        POPULATE_SCHEMA(internal::upsertIdentitySchema, sIdentityUpsert)
     }
 
     init__schemas s = init__schemas();
