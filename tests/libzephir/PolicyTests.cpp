@@ -53,5 +53,5 @@ TEST(PolicyTest, ShouldMatchPartialPolicy) {
 
     auto p2Result = p2.match("TestAction", std::nullopt);
     ASSERT_EQ(PARTIAL, p2Result->type);
-    ASSERT_EQ("{\"actions\":[\"urn:resource:test\"],\"effect\":\"Allow\",\"version\":1}", p2Result->getPartial()->toJson());
+    ASSERT_EQ("{\"actions\":[\"urn:resource:test\"],\"effect\":\"Allow\",\"version\":1}", p2Result->getPartial()->toJsonString());
 }

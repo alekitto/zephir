@@ -7,20 +7,24 @@ using namespace libzephir::identity;
 
 class ConcreteSubject : public Subject {
 public:
-    explicit ConcreteSubject(const Policy & policy): Subject(policy) {}
-    ConcreteSubject(const Policy & policy, std::vector<Policy> policies): Subject(policy, std::move(policies)) { }
+    explicit ConcreteSubject(std::shared_ptr<Policy> policy): Subject(policy) {}
+    ConcreteSubject(std::shared_ptr<Policy> policy, std::vector<std::shared_ptr<Policy>> policies): Subject(policy, std::move(policies)) { }
+
+    nlohmann::json toJson() override {
+        return nlohmann::json();
+    }
 };
 
 TEST(SubjectTest, CanBeCreated) {
-    Subject subject = ConcreteSubject(EmptyPolicy());
+    ConcreteSubject subject = ConcreteSubject(std::make_shared<EmptyPolicy>());
     ASSERT_EQ(0, subject.linkedPolicies().size());
 }
 
 TEST(SubjectTest, PoliciesCanBeAdded) {
-    Subject subject = ConcreteSubject(EmptyPolicy());
-    subject.addPolicy(Policy(VERSION_1, "RoleTestPolicy", ALLOW, {"*" }));
+    ConcreteSubject subject = ConcreteSubject(std::make_shared<EmptyPolicy>());
+    subject.addPolicy(std::make_shared<Policy>(VERSION_1, "RoleTestPolicy", ALLOW, string_vector{"*"}));
 
-    Policy rtp2 = Policy(VERSION_1, "RoleTestPolicy2", ALLOW, { "*" });
+    auto rtp2 = std::make_shared<Policy>(VERSION_1, "RoleTestPolicy2", ALLOW, string_vector{ "*" });
     subject.addPolicy(rtp2);
 
     ASSERT_EQ(2, subject.linkedPolicies().size());
@@ -28,23 +32,23 @@ TEST(SubjectTest, PoliciesCanBeAdded) {
     subject.addPolicy(rtp2);
     ASSERT_EQ(2, subject.linkedPolicies().size());
 
-    Subject subjectWithPolicies = ConcreteSubject(EmptyPolicy(), {
-        Policy(VERSION_1, "RoleTestPolicy3", ALLOW, { "*" })
+    ConcreteSubject subjectWithPolicies = ConcreteSubject(std::make_shared<EmptyPolicy>(), {
+        std::make_shared<Policy>(VERSION_1, "RoleTestPolicy3", ALLOW, string_vector{ "*" })
     });
 
     ASSERT_EQ(1, subjectWithPolicies.linkedPolicies().size());
 
-    Subject subjectWithInlinePolicy = ConcreteSubject(
-        Policy(VERSION_1, "RoleTestPolicy3", ALLOW, { "*" })
+    ConcreteSubject subjectWithInlinePolicy = ConcreteSubject(
+        std::make_shared<Policy>(VERSION_1, "RoleTestPolicy3", ALLOW, string_vector{ "*" })
     );
     ASSERT_EQ(0, subjectWithInlinePolicy.linkedPolicies().size());
 }
 
 TEST(SubjectTest, PoliciesCanBeRemoved) {
-    Subject subject = ConcreteSubject(EmptyPolicy());
-    subject.addPolicy(Policy(VERSION_1, "RoleTestPolicy", ALLOW, {"*" }));
+    ConcreteSubject subject = ConcreteSubject(std::make_shared<EmptyPolicy>());
+    subject.addPolicy(std::make_shared<Policy>(VERSION_1, "RoleTestPolicy", ALLOW, string_vector{"*" }));
 
-    Policy rtp2 = Policy(VERSION_1, "RoleTestPolicy2", ALLOW, { "*" });
+    auto rtp2 = std::make_shared<Policy>(VERSION_1, "RoleTestPolicy2", ALLOW, string_vector{ "*" });
     subject.addPolicy(rtp2);
 
     ASSERT_EQ(2, subject.linkedPolicies().size());
@@ -57,9 +61,9 @@ TEST(SubjectTest, PoliciesCanBeRemoved) {
 }
 
 TEST(SubjectTest, AllowedShouldWork) {
-    Subject subject = ConcreteSubject(EmptyPolicy(), {
-        Policy(VERSION_1, "RoleTestPolicy", ALLOW, { "TestAction" }),
-        Policy(VERSION_1, "RoleTestPolicy2", DENY, { "TestAction" }, { "urn:resource:test-class-deny:*" })
+    ConcreteSubject subject = ConcreteSubject(std::make_shared<EmptyPolicy>(), {
+        std::make_shared<Policy>(VERSION_1, "RoleTestPolicy", ALLOW, string_vector{ "TestAction" }),
+        std::make_shared<Policy>(VERSION_1, "RoleTestPolicy2", DENY, string_vector{ "TestAction" }, string_vector{ "urn:resource:test-class-deny:*" })
     });
 
     auto result = subject.allowed("TestAction", "urn:resource:test-class-allow:test-id");

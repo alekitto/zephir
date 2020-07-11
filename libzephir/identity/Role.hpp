@@ -54,6 +54,7 @@ namespace libzephir::identity {
             _linkedPolicies.push_back(move(policy));
         }
 
+        void removePolicy(std::shared_ptr<Policy> &policy) { this->removePolicy(policy->id); }
         void removePolicy(Policy &policy) { this->removePolicy(policy.id); }
         void removePolicy(const std::string &id) {
             using namespace std;

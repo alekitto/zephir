@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <memory>
 #include "../../../libzephir/identity/Role.hpp"
 
 using namespace libzephir;
@@ -7,7 +8,7 @@ using namespace libzephir::identity;
 class ConcreteRole : public Role {
 public:
     ConcreteRole(): Role() {}
-    explicit ConcreteRole(std::vector<Policy> policies): Role(std::move(policies)) { }
+    explicit ConcreteRole(std::vector<std::shared_ptr<Policy>> policies): Role(std::move(policies)) { }
 };
 
 TEST(RoleTest, CanBeCreated) {
@@ -17,9 +18,9 @@ TEST(RoleTest, CanBeCreated) {
 
 TEST(RoleTest, PoliciesCanBeAdded) {
     Role role = ConcreteRole();
-    role.addPolicy(Policy(VERSION_1, "RoleTestPolicy", ALLOW, { "*" }));
+    role.addPolicy(std::make_shared<Policy>(VERSION_1, "RoleTestPolicy", ALLOW, string_vector{ "*" }));
 
-    Policy rtp2 = Policy(VERSION_1, "RoleTestPolicy2", ALLOW, { "*" });
+    auto rtp2 = std::make_shared<Policy>(VERSION_1, "RoleTestPolicy2", ALLOW, string_vector{ "*" });
     role.addPolicy(rtp2);
 
     ASSERT_EQ(2, role.linkedPolicies().size());
@@ -27,8 +28,8 @@ TEST(RoleTest, PoliciesCanBeAdded) {
     role.addPolicy(rtp2);
     ASSERT_EQ(2, role.linkedPolicies().size());
 
-    Role roleWithPolicies = ConcreteRole({
-        Policy(VERSION_1, "RoleTestPolicy3", ALLOW, { "*" })
+    ConcreteRole roleWithPolicies = ConcreteRole({
+         std::make_shared<Policy>(VERSION_1, "RoleTestPolicy3", ALLOW, string_vector{ "*" })
     });
 
     ASSERT_EQ(1, roleWithPolicies.linkedPolicies().size());
@@ -36,9 +37,9 @@ TEST(RoleTest, PoliciesCanBeAdded) {
 
 TEST(RoleTest, PoliciesCanBeRemoved) {
     Role role = ConcreteRole();
-    role.addPolicy(Policy(VERSION_1, "RoleTestPolicy", ALLOW, { "*" }));
+    role.addPolicy(std::make_shared<Policy>(VERSION_1, "RoleTestPolicy", ALLOW, string_vector{ "*" }));
 
-    Policy rtp2 = Policy(VERSION_1, "RoleTestPolicy2", ALLOW, { "*" });
+    auto rtp2 = std::make_shared<Policy>(VERSION_1, "RoleTestPolicy2", ALLOW, string_vector{ "*" });
     role.addPolicy(rtp2);
 
     ASSERT_EQ(2, role.linkedPolicies().size());
@@ -52,8 +53,8 @@ TEST(RoleTest, PoliciesCanBeRemoved) {
 
 TEST(RoleTest, AllowedShouldWork) {
     Role role = ConcreteRole({
-        Policy(VERSION_1, "RoleTestPolicy", ALLOW, { "TestAction" }),
-        Policy(VERSION_1, "RoleTestPolicy2", DENY, { "TestAction" }, { "urn:resource:test-class-deny:*" })
+        std::make_shared<Policy>(VERSION_1, "RoleTestPolicy", ALLOW, string_vector{ "TestAction" }),
+        std::make_shared<Policy>(VERSION_1, "RoleTestPolicy2", DENY, string_vector{ "TestAction" }, string_vector{ "urn:resource:test-class-deny:*" })
     });
 
     auto result = role.allowed("TestAction", "urn:resource:test-class-allow:test-id");

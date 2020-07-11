@@ -6,16 +6,16 @@ using namespace libzephir;
 using namespace libzephir::identity;
 
 TEST(GroupTest, CanBeCreated) {
-    Group g = Group("Group", EmptyPolicy());
+    Group g = Group("Group", std::make_shared<EmptyPolicy>());
     ASSERT_EQ(0, g.getIdentities().size());
 
-    Group g2 = Group("Group", Policy(VERSION_1, "TestPolicyGroup", ALLOW, { "Action" }));
+    Group g2 = Group("Group", std::make_shared<Policy>(VERSION_1, "TestPolicyGroup", ALLOW, string_vector{ "Action" }));
     ASSERT_EQ(0, g.getIdentities().size());
 }
 
 TEST(GroupTest, IdentitiesCanBeAdded) {
-    Group g = Group("Group", EmptyPolicy());
-    auto i = std::make_shared<Identity>("TestIdentity", EmptyPolicy());
+    Group g = Group("Group", std::make_shared<EmptyPolicy>());
+    auto i = std::make_shared<Identity>("TestIdentity", std::make_shared<EmptyPolicy>());
     g.addIdentity(i);
     g.addIdentity(i);
 
@@ -23,9 +23,9 @@ TEST(GroupTest, IdentitiesCanBeAdded) {
 }
 
 TEST(GroupTest, IdentitiesCanBeRemoved) {
-    Group g = Group("Group", EmptyPolicy());
-    auto i = std::make_shared<Identity>("TestIdentity", EmptyPolicy());
-    auto i2 = std::make_shared<Identity>("TestIdentity2", EmptyPolicy());
+    Group g = Group("Group", std::make_shared<EmptyPolicy>());
+    auto i = std::make_shared<Identity>("TestIdentity", std::make_shared<EmptyPolicy>());
+    auto i2 = std::make_shared<Identity>("TestIdentity2", std::make_shared<EmptyPolicy>());
 
     g.addIdentity(i);
     g.addIdentity(i2);
