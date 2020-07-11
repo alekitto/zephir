@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_SUBJECT_HPP
-#define ZEPHIR_SUBJECT_HPP
+#pragma once
 
 #include <functional>
 
@@ -26,5 +25,3 @@ namespace libzephir::identity {
         }
     };
 }
-
-#endif //ZEPHIR_SUBJECT_HPP

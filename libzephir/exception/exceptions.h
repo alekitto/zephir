@@ -1,8 +1,5 @@
-#ifndef ZEPHIR_EXCEPTIONS_H
-#define ZEPHIR_EXCEPTIONS_H
+#pragma once
 
 #include "ActionsCannotBeEmptyException.hpp"
 #include "UnknownPolicyVersionException.hpp"
 #include "UnsupportedStorageDsn.hpp"
-
-#endif //ZEPHIR_EXCEPTIONS_H

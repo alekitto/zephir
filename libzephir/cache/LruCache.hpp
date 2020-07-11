@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_LRUCACHE_HPP
-#define ZEPHIR_LRUCACHE_HPP
+#pragma once
 
 #include <list>
 #include <map>
@@ -107,5 +106,3 @@ namespace libzephir::cache {
         }
     };
 }
-
-#endif //ZEPHIR_LRUCACHE_HPP

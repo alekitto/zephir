@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_ROLE_HPP
-#define ZEPHIR_ROLE_HPP
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -74,5 +73,3 @@ namespace libzephir::identity {
         }
     };
 }
-
-#endif //ZEPHIR_ROLE_HPP

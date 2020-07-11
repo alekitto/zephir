@@ -9,16 +9,16 @@
 int main() {
     using namespace libzephir;
     using namespace libzephir::storage;
-    using namespace zephir::server;
 
     auto dsn = std::getenv("DSN");
     if (dsn == nullptr) {
         std::cerr << "Database DSN is not defined" << std::endl;
+        abort();
     }
 
     auto manager = Manager::createManager(dsn);
 
-    Server s(*manager);
+    zephir::server::Server s(*manager);
     s.listen();
 
     return 0;

@@ -1,13 +1,11 @@
-#ifndef ZEPHIR_JSON_READER_HPP
-#define ZEPHIR_JSON_READER_HPP
-
 #include <string>
 #include <nlohmann/json.hpp>
+#include <httplib.h>
 
 namespace zephir::server {
     using namespace nlohmann;
 
-    auto json_reader(const httplib::ContentReader &content_reader) {
+    json json_reader(const httplib::ContentReader &content_reader) {
         std::string body;
         content_reader([&](const char *data, size_t data_length) {
             body.append(data, data_length);
@@ -17,5 +15,3 @@ namespace zephir::server {
         return json::parse(body);
     }
 }
-
-#endif //ZEPHIR_JSON_READER_HPP

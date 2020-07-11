@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_EFFECT_HPP
-#define ZEPHIR_EFFECT_HPP
+#pragma once
 
 namespace libzephir {
     enum PolicyEffect {
@@ -7,5 +6,3 @@ namespace libzephir {
         ALLOW = 1,
     };
 }
-
-#endif //ZEPHIR_EFFECT_HPP

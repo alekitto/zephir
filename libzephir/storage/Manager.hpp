@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_MANAGER_HPP
-#define ZEPHIR_MANAGER_HPP
+#pragma once
 
 #include <memory>
 #include <string>
@@ -25,14 +24,9 @@ namespace libzephir {
             cache m_cache;
             std::recursive_mutex m_lock = std::recursive_mutex();
 
-            virtual std::shared_ptr<Group>
-            _findGroup(const std::string & id) = 0;
-
-            virtual std::shared_ptr<Identity>
-            _findIdentity(const std::string & id) = 0;
-
-            virtual std::shared_ptr<Policy>
-            _findPolicy(const std::string & id) = 0;
+            virtual std::shared_ptr<Group> _findGroup(const std::string & id) = 0;
+            virtual std::shared_ptr<Identity> _findIdentity(const std::string & id) = 0;
+            virtual std::shared_ptr<Policy> _findPolicy(const std::string & id) = 0;
 
         public:
             std::shared_ptr<Identity>
@@ -62,13 +56,10 @@ namespace libzephir {
                     .value_or(this->_findPolicy(id));
             }
 
-            virtual std::vector<std::shared_ptr<Group>>
-            getGroupsFor(const Identity & identity) = 0;
+            virtual void save(const Policy & p) = 0;
 
-            static std::shared_ptr<Manager>
-            createManager(const std::string & dsn);
+            virtual std::vector<std::shared_ptr<Group>> getGroupsFor(const Identity & identity) = 0;
+            static std::shared_ptr<Manager> createManager(const std::string & dsn);
         };
     }
 }
-
-#endif //ZEPHIR_MANAGER_HPP

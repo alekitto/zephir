@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_UNKNOWNPOLICYVERSIONEXCEPTION_HPP
-#define ZEPHIR_UNKNOWNPOLICYVERSIONEXCEPTION_HPP
+#pragma once
 
 #include <exception>
 
@@ -19,5 +18,3 @@ namespace libzephir::exception {
         }
     };
 }
-
-#endif //ZEPHIR_UNKNOWNPOLICYVERSIONEXCEPTION_HPP

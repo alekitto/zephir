@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_APPLY_H
-#define ZEPHIR_APPLY_H
+#pragma once
 
 #include <vector>
 
@@ -23,5 +22,3 @@ namespace libzephir::util {
         return result;
     }
 }
-
-#endif //ZEPHIR_APPLY_H

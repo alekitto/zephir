@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_MATCHRESULT_HPP
-#define ZEPHIR_MATCHRESULT_HPP
+#pragma once
 
 #include <memory>
 #include <optional>
@@ -41,5 +40,3 @@ namespace libzephir {
         void _update();
     };
 }
-
-#endif //ZEPHIR_MATCHRESULT_HPP

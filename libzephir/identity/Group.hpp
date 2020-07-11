@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_GROUP_HPP
-#define ZEPHIR_GROUP_HPP
+#pragma once
 
 #include <string>
 #include <utility>
@@ -46,5 +45,3 @@ namespace libzephir::identity {
         }
     };
 }
-
-#endif //ZEPHIR_GROUP_HPP

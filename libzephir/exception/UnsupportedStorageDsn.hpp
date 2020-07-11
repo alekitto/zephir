@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_UNSUPPORTEDSTORAGEDSN_HPP
-#define ZEPHIR_UNSUPPORTEDSTORAGEDSN_HPP
+#pragma once
 
 #include <exception>
 
@@ -11,5 +10,3 @@ namespace libzephir::exception {
         }
     };
 }
-
-#endif //ZEPHIR_UNSUPPORTEDSTORAGEDSN_HPP

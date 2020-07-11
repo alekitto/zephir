@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_ALLOWEDRESULT_HPP
-#define ZEPHIR_ALLOWEDRESULT_HPP
+#pragma once
 
 #include <vector>
 
@@ -75,5 +74,3 @@ namespace libzephir {
         }
     };
 }
-
-#endif //ZEPHIR_ALLOWEDRESULT_HPP

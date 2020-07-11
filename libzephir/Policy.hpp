@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_POLICY_HPP
-#define ZEPHIR_POLICY_HPP
+#pragma once
 
 #include <memory>
 
@@ -17,12 +16,14 @@ namespace libzephir {
         std::shared_ptr<CompiledPolicy> _compiled;
 
         void compile();
-
         void compile(Compiler &compiler);
 
     public:
         const PolicyVersion &version;
         const std::string &id;
+
+        [[nodiscard]] const string_vector & actions() const { return this->_actions.value(); }
+        [[nodiscard]] const string_vector & resources() const { return this->_resources.value(); }
 
         Policy &operator=(Policy p) {
             using namespace std;
@@ -70,7 +71,7 @@ namespace libzephir {
             json j = {
                 {"version",   (int) this->_version},
                 {"id",        this->_id},
-                {"effect",    this->_effect == ALLOW ? "Allow" : "Deny"},
+                {"effect",    this->_effect == ALLOW ? "ALLOW" : "DENY"},
                 {"actions",   this->_actions.value()},
                 {"resources", this->_resources.value()}
             };
@@ -79,5 +80,3 @@ namespace libzephir {
         }
     };
 }
-
-#endif //ZEPHIR_POLICY_HPP

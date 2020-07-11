@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_IDENTITY_H
-#define ZEPHIR_IDENTITY_H
+#pragma once
 
 #include <string>
 #include "Subject.hpp"
@@ -14,5 +13,3 @@ namespace libzephir::identity {
         Identity(std::string pId, const Policy &policy) : Subject(policy), _id(std::move(pId)), id(_id) {}
     };
 }
-
-#endif //ZEPHIR_IDENTITY_H

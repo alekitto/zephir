@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_INVALIDDSNEXCEPTION_H
-#define ZEPHIR_INVALIDDSNEXCEPTION_H
+#pragma once
 
 #include <exception>
 
@@ -11,5 +10,3 @@ namespace libzephir::storage::exception {
         }
     };
 }
-
-#endif //ZEPHIR_INVALIDDSNEXCEPTION_H

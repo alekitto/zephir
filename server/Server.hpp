@@ -1,20 +1,49 @@
-#ifndef ZEPHIR_SERVER_HPP
-#define ZEPHIR_SERVER_HPP
+#pragma once
 
 #include <httplib.h>
 #include "../libzephir/storage/Manager.hpp"
-#include "json-reader.hpp"
+#include "schemas/schemas.hpp"
 
 namespace zephir::server {
+    using namespace nlohmann;
     using namespace libzephir::storage;
+    using namespace httplib;
+
+    extern json json_reader(const httplib::ContentReader &content_reader);
 
     class Server {
         Manager & m_manager;
 
+        static void invalid_request_handler(const char * msg, httplib::Response &res) {
+            json j = json({
+                {"status", "Bad Request"},
+                {"code",   400},
+                {"detail", { msg }}
+            });
+
+            res.set_content(j.dump(), "application/json");
+            res.status = 400;
+        }
+
+        template<class T>
+        static void invalid_request_handler(std::vector<T> detail, httplib::Response &res) {
+            json j = json({
+                {"status", "Bad Request"},
+                {"code",   400},
+                {"detail", detail}
+            });
+
+            res.set_content(j.dump(), "application/json");
+            res.status = 400;
+        }
+
+        void upsertPolicy(const Request &req, Response &res, const ContentReader &content_reader);
+
+        void allowedAction(const Request &req, Response &res, const ContentReader &content_reader);
+
     public:
         explicit Server(Manager & manager): m_manager(manager) {}
         void listen() {
-            using namespace httplib;
             using HttpServer = httplib::Server;
 
             HttpServer srv;
@@ -24,72 +53,11 @@ namespace zephir::server {
             });
 
             srv.Post("/allowed", [&](const Request &req, Response &res, const ContentReader &content_reader) {
-                using namespace nlohmann;
+                this->allowedAction(req, res, content_reader);
+            });
 
-                auto invalid_request_handler = [&](const char * msg, Response &res) {
-                    json j = json({
-                        {"status", "Bad Request"},
-                        {"code", 400},
-                        {"detail", msg}
-                    });
-
-                    res.set_content(j.dump(), "application/json");
-                    res.status = 400;
-                };
-
-                json j;
-                try {
-                    j = json_reader(content_reader);
-                } catch (json::parse_error& ex) {
-                    invalid_request_handler("Invalid body", res);
-                    return;
-                }
-
-                try {
-                    j.at("subject");
-                } catch (json::out_of_range & ex) {
-                    invalid_request_handler("Identity must be specified", res);
-                    return;
-                }
-
-                try {
-                    j.at("action");
-                } catch (json::out_of_range & ex) {
-                    invalid_request_handler("Action must be specified", res);
-                    return;
-                }
-
-                std::optional<std::string> resource(std::nullopt);
-                try {
-                    resource = j["resource"].get<std::string>();
-                } catch (json::type_error & ex) {
-                    // Do nothing.
-                }
-
-                std::string identity, action;
-                try {
-                    identity = j["subject"].get<std::string>();
-                    action = j["action"].get<std::string>();
-                } catch (json::type_error & ex) {
-                    invalid_request_handler("Invalid data", res);
-                    return;
-                }
-
-                auto i = this->m_manager.getIdentity(identity);
-                libzephir::AllowedResult result(libzephir::AllowedOutcome::ABSTAIN, {});
-                if (i == nullptr) {
-                    result.merge(libzephir::AllowedResult(libzephir::AllowedOutcome::DENIED, {}));
-                } else {
-                    result.merge(*i->allowed(action, resource));
-                    auto groups = this->m_manager.getGroupsFor(*i);
-
-                    for (auto &g : groups) {
-                        result.merge(*g->allowed(action, resource));
-                    }
-                }
-
-                res.set_content(result.toJson(), "application/json");
-                res.status = result.outcome == libzephir::DENIED ? 403 : 200;
+            srv.Post("/policies", [&](const Request &req, Response &res, const ContentReader &content_reader) {
+                this->upsertPolicy(req, res, content_reader);
             });
 
             std::cout << "Listening on port 8091" << std::endl;
@@ -97,5 +65,3 @@ namespace zephir::server {
         }
     };
 }
-
-#endif //ZEPHIR_SERVER_HPP

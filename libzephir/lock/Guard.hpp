@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_GUARD_HPP
-#define ZEPHIR_GUARD_HPP
+#pragma once
 
 #include <mutex>
 
@@ -13,5 +12,3 @@ namespace libzephir::lock {
         ~Guard() { this->lock.unlock(); }
     };
 }
-
-#endif //ZEPHIR_GUARD_HPP

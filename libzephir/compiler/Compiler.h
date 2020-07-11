@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_COMPILER_H
-#define ZEPHIR_COMPILER_H
+#pragma once
 
 #include <memory>
 #include <regex>
@@ -18,6 +17,7 @@ namespace libzephir {
 
         public:
             std::shared_ptr<CompiledPolicy> compile(Policy &policy);
+            void clearCache() { this->_cache.clear(); }
 
             static Compiler &getInstance() {
                 static Compiler instance;
@@ -26,5 +26,3 @@ namespace libzephir {
         };
     }
 }
-
-#endif //ZEPHIR_COMPILER_H

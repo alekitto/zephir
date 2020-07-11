@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_PARTIALPOLICY_HPP
-#define ZEPHIR_PARTIALPOLICY_HPP
+#pragma once
 
 #include <memory>
 #include <optional>
@@ -91,5 +90,3 @@ namespace libzephir {
         }
     };
 }
-
-#endif //ZEPHIR_POLICY_HPP

@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_EMPTYPOLICY_HPP
-#define ZEPHIR_EMPTYPOLICY_HPP
+#pragma once
 
 #include <memory>
 #include "Policy.hpp"
@@ -26,5 +25,3 @@ namespace libzephir {
         }
     };
 }
-
-#endif //ZEPHIR_EMPTYPOLICY_HPP

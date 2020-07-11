@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_ACTIONSCANNOTBEEMPTYEXCEPTION_HPP
-#define ZEPHIR_ACTIONSCANNOTBEEMPTYEXCEPTION_HPP
+#pragma once
 
 #include <exception>
 
@@ -11,5 +10,3 @@ namespace libzephir::exception {
         }
     };
 }
-
-#endif //ZEPHIR_ACTIONSCANNOTBEEMPTYEXCEPTION_HPP

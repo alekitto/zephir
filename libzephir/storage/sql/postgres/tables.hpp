@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_TABLES_HPP
-#define ZEPHIR_TABLES_HPP
+#pragma once
 
 #include "tables/group.h"
 #include "tables/group_identity.h"
@@ -16,5 +15,3 @@ namespace libzephir::storage::sql::postgres {
     typedef ::model::public_::identity_policy IdentityPolicyTable;
     typedef ::model::public_::policy PolicyTable;
 }
-
-#endif //ZEPHIR_TABLES_HPP

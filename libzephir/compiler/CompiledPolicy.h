@@ -1,5 +1,4 @@
-#ifndef ZEPHIR_COMPILEDPOLICY_H
-#define ZEPHIR_COMPILEDPOLICY_H
+#pragma once
 
 #include <optional>
 #include <regex>
@@ -51,5 +50,3 @@ namespace libzephir::compiler {
         }
     };
 }
-
-#endif //ZEPHIR_COMPILEDPOLICY_H
