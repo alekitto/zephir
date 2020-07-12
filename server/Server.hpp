@@ -69,8 +69,14 @@ namespace zephir::server {
                 this->upsertIdentity(req, res, content_reader);
             });
 
-            spdlog::info("Listening on port 8091");
-            srv.listen("0.0.0.0", 8091);
+            auto server_port = 8091;
+            auto server_port_str = std::getenv("SERVE_PORT");
+            if (nullptr != server_port_str) {
+                server_port = atoi(server_port_str);
+            }
+
+            spdlog::info(std::string("Listening on port ") + std::to_string(server_port));
+            srv.listen("0.0.0.0", server_port);
         }
     };
 }
