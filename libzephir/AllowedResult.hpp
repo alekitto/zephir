@@ -40,7 +40,7 @@ namespace libzephir {
             }
 
             json j = {
-                {"outcome", rOutcome == ALLOWED ? "Allowed" : rOutcome == ABSTAIN ? "Abstain" : "Denied"},
+                {"outcome",  rOutcome == ALLOWED ? "ALLOWED" : rOutcome == ABSTAIN ? "ABSTAIN" : "DENIED"},
                 {"partials", partialsJson}
             };
 
