@@ -1,6 +1,7 @@
 #pragma once
 
 #include <httplib.h>
+#include <spdlog/spdlog.h>
 #include "../libzephir/storage/Manager.hpp"
 #include "schemas/schemas.hpp"
 
@@ -48,6 +49,10 @@ namespace zephir::server {
             using HttpServer = httplib::Server;
 
             HttpServer srv;
+            srv.set_logger([&](const Request& req, const Response &res) {
+                spdlog::debug(std::string("Handled ") + req.path + " [from " + req.remote_addr + "]. Result: " + std::to_string(res.status));
+            });
+
             srv.Get("/_status", [&](const Request &req, Response &res) {
                 res.set_content(R"({"status":"OK"})", "application/json");
                 res.status = 200;
@@ -64,7 +69,7 @@ namespace zephir::server {
                 this->upsertIdentity(req, res, content_reader);
             });
 
-            std::cout << "Listening on port 8091" << std::endl;
+            spdlog::info("Listening on port 8091");
             srv.listen("0.0.0.0", 8091);
         }
     };
