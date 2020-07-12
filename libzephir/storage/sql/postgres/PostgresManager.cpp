@@ -173,6 +173,14 @@ void PostgresManager::save(const Identity &i) {
     const Policy & embeddedPolicy = i.getInlinePolicy();
 
     this->db.start_transaction();
+    if (embeddedPolicy.complete()) {
+        Policy persistingPolicy(embeddedPolicy.version, embedded_policy_id, embeddedPolicy.effect,
+            embeddedPolicy.actions(), embeddedPolicy.resources());
+        this->save(persistingPolicy);
+    } else {
+        this->db(::sqlpp::remove_from(policy).where(policy.id == embedded_policy_id));
+    }
+
     auto row = this->db(::sqlpp::select(identity.id).from(identity).where(identity.id == i.id));
     if (! row.empty()) {
         auto update = ::sqlpp::update(identity)
@@ -192,12 +200,6 @@ void PostgresManager::save(const Identity &i) {
         }
 
         this->db(insert);
-    }
-
-    if (embeddedPolicy.complete()) {
-        Policy persistingPolicy(embeddedPolicy.version, embedded_policy_id, embeddedPolicy.effect,
-            embeddedPolicy.actions(), embeddedPolicy.resources());
-        this->save(persistingPolicy);
     }
 
     this->db(::sqlpp::remove_from(identityPolicy).where(identityPolicy.identity_id == i.id));

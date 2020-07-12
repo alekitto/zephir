@@ -74,7 +74,7 @@ namespace libzephir {
         virtual nlohmann::json toJson() {
             nlohmann::json j = {
                 {"version", (int) this->_version},
-                {"effect",  this->_effect == ALLOW ? "Allow" : "Deny"},
+                {"effect",  this->_effect == ALLOW ? "ALLOW" : "DENY"},
             };
 
             if (this->_actions.has_value()) {
@@ -82,7 +82,7 @@ namespace libzephir {
             }
 
             if (this->_resources.has_value()) {
-                j["actions"] = this->_resources.value();
+                j["resources"] = this->_resources.value();
             }
 
             return j;

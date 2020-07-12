@@ -19,7 +19,7 @@ namespace zephir::server {
         using namespace nlohmann;
         DECODE_AND_VALIDATE_JSON(j, zephir::json_schema::sIdentityUpsert, res)
 
-        const nlohmann::json & embed = j["embedded_policy"].get<nlohmann::json>();
+        const nlohmann::json & embed = j["inline_policy"].get<nlohmann::json>();
 
         std::shared_ptr<libzephir::Policy> embeddedPolicy = nullptr;
         std::string id;

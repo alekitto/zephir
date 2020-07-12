@@ -29,9 +29,9 @@ namespace libzephir {
         std::string toJsonString() {
             using namespace nlohmann;
 
-            std::vector<std::string> partialsJson;
+            std::vector<nlohmann::json> partialsJson;
             for (auto & partial : this->_partials) {
-                partialsJson.push_back(partial.toJsonString());
+                partialsJson.push_back(partial.toJson());
             }
 
             auto rOutcome = this->_outcome;
