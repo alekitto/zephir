@@ -10,11 +10,13 @@
     }
 
 namespace zephir::json_schema {
-    valijson::Schema sPolicyUpsert;
-    valijson::Schema sIdentityUpsert;
+    valijson::Schema sAddGroupMember;
     valijson::Schema sAllowed;
+    valijson::Schema sIdentityUpsert;
+    valijson::Schema sPolicyUpsert;
 
     init__schemas::init__schemas() {
+        POPULATE_SCHEMA(internal::addGroupMember, sAddGroupMember)
         POPULATE_SCHEMA(internal::allowedSchema, sAllowed)
         POPULATE_SCHEMA(internal::upsertPolicySchema, sPolicyUpsert)
         POPULATE_SCHEMA(internal::upsertIdentitySchema, sIdentityUpsert)

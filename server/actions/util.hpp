@@ -7,7 +7,7 @@
         try { \
             json_var = json_reader(content_reader); \
         } catch (json::parse_error& ex) { \
-            invalid_request_handler("Invalid body", res); \
+            this->invalid_request_handler("Invalid body", res); \
             return; \
         } \
         \

@@ -1,7 +1,7 @@
 namespace zephir::json_schema::internal {
     const char * upsertPolicySchema = R";-]({
 "$schema": "http://json-schema.org/draft-07/schema",
-"$id": "http://example.com/example.json",
+"$id": "http://zephir/upsert-policy",
 "type": "object",
 "title": "The upset policy schema",
 "default": {},

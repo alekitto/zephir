@@ -38,6 +38,20 @@ namespace zephir::server {
             res.status = 400;
         }
 
+        inline static void createNotFoundResponse(httplib::Response &res) { Server::createNotFoundResponse("Not found.", res); }
+        static void createNotFoundResponse(const char * msg, httplib::Response &res) {
+            json j = json({
+                {"status", msg},
+                {"code",   404},
+            });
+
+            res.set_content(j.dump(), "application/json");
+            res.status = 404;
+        }
+
+        void register_groups_actions(httplib::Server &srv);
+        void addGroupMember(std::shared_ptr<libzephir::Group> group, Response &res, const ContentReader &content_reader);
+
         void upsertIdentity(const Request &req, Response &res, const ContentReader &content_reader);
         void upsertPolicy(const Request &req, Response &res, const ContentReader &content_reader);
 
@@ -68,6 +82,8 @@ namespace zephir::server {
             srv.Post("/identities", [&](const Request &req, Response &res, const ContentReader &content_reader) {
                 this->upsertIdentity(req, res, content_reader);
             });
+
+            this->register_groups_actions(srv);
 
             auto server_port = 8091;
             auto server_port_str = std::getenv("SERVE_PORT");

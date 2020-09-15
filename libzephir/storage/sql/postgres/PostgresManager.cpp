@@ -168,6 +168,54 @@ std::shared_ptr<Policy> PostgresManager::_findPolicy(const std::string &id) {
     return p;
 }
 
+void PostgresManager::save(const Group &g) {
+    std::string embedded_policy_id = "__embedded_policy_group_" + g.name + "__";
+    const Policy & embeddedPolicy = g.getInlinePolicy();
+
+    this->db.start_transaction();
+    if (embeddedPolicy.complete()) {
+        Policy persistingPolicy(embeddedPolicy.version, embedded_policy_id, embeddedPolicy.effect,
+            embeddedPolicy.actions(), embeddedPolicy.resources());
+        this->save(persistingPolicy);
+    } else {
+        this->db(::sqlpp::remove_from(policy).where(policy.id == embedded_policy_id));
+    }
+
+    auto row = this->db(::sqlpp::select(group.id).from(group).where(group.id == g.name));
+    if (! row.empty()) {
+        auto update = ::sqlpp::update(group)
+            .where(group.id == g.name);
+
+        if (embeddedPolicy.complete()) {
+            this->db(update.set(group.policy_id = embedded_policy_id));
+        } else {
+            this->db(update.set(group.policy_id = ::sqlpp::null));
+        }
+    } else {
+        auto insert = ::sqlpp::insert_into(group).columns(group.id, group.policy_id);
+        if (embeddedPolicy.complete()) {
+            insert.values.add(group.id = g.name, group.policy_id = embedded_policy_id);
+        } else {
+            insert.values.add(group.id = g.name, group.policy_id = ::sqlpp::null);
+        }
+
+        this->db(insert);
+    }
+
+    this->db(::sqlpp::remove_from(groupPolicy).where(groupPolicy.group_id == g.name));
+    for (auto & p : g.linkedPolicies()) {
+        this->db(::sqlpp::insert_into(groupPolicy)
+            .set(groupPolicy.group_id = g.name, groupPolicy.policy_id = p->id)
+        );
+    }
+
+    this->db.commit_transaction();
+
+    this->m_cache.groups.clear();
+    this->m_cache.groupsPerIdentity.clear();
+    Compiler::getInstance().clearCache();
+}
+
 void PostgresManager::save(const Identity &i) {
     std::string embedded_policy_id = "__embedded_policy_identity_" + i.id + "__";
     const Policy & embeddedPolicy = i.getInlinePolicy();

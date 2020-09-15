@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
 project(zephir)
 
+add_custom_target(install_deps ALL
+    COMMAND conan install --build missing ..
+    COMMENT "Installing dependencies"
+)
+
 SET(ENABLE_TESTS OFF CACHE BOOL "SQLPP11 Build unit tests")
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/extern ${CMAKE_MODULE_PATH})
 
@@ -26,15 +31,19 @@ add_library(libzephir STATIC
     libzephir/storage/sql/postgres/PostgresManager.cpp
 )
 set_target_properties(libzephir PROPERTIES PREFIX "")
+add_dependencies(libzephir install_deps)
 
 add_executable(zephir "")
 target_sources(zephir PRIVATE
     main.cpp
     server/json-reader.cpp
     server/schemas/schemas.cpp
+    server/schemas/addGroupMember.json.cpp
     server/schemas/allowed.json.cpp
     server/schemas/upsert_identity.json.cpp
     server/schemas/upsert_policy.json.cpp
+    server/actions/groups/addGroupMember.cpp
+    server/actions/groups/register-actions.cpp
     server/actions/allowed.cpp
     server/actions/upsertIdentity.cpp
     server/actions/upsertPolicy.cpp
