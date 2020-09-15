@@ -33,6 +33,7 @@ namespace libzephir::identity {
             this->m_identities.push_back(identity);
         }
 
+        void removeIdentity(const std::shared_ptr<Identity> &identity) { this->removeIdentity(identity->id); }
         void removeIdentity(Identity &identity) { this->removeIdentity(identity.id); }
         void removeIdentity(const std::string &id) {
             using namespace std;

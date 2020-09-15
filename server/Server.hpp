@@ -15,7 +15,9 @@ namespace zephir::server {
     class Server {
         Manager & m_manager;
 
-        static void invalid_request_handler(const char * msg, httplib::Response &res) {
+        static std::shared_ptr<libzephir::Policy> decodePolicy(const nlohmann::json &j);
+
+        static void invalidRequestHandler(const char * msg, httplib::Response &res) {
             json j = json({
                 {"status", "Bad Request"},
                 {"code",   400},
@@ -27,7 +29,7 @@ namespace zephir::server {
         }
 
         template<class T>
-        static void invalid_request_handler(std::vector<T> detail, httplib::Response &res) {
+        static void invalidRequestHandler(std::vector<T> detail, httplib::Response &res) {
             json j = json({
                 {"status", "Bad Request"},
                 {"code",   400},
@@ -49,9 +51,11 @@ namespace zephir::server {
             res.status = 404;
         }
 
-        void register_groups_actions(httplib::Server &srv);
-        void addGroupMember(std::shared_ptr<libzephir::Group> group, Response &res, const ContentReader &content_reader);
+        void registerGroupsActions(httplib::Server &srv);
+        void addGroupMember(const std::shared_ptr<libzephir::Group>& group, Response &res, const ContentReader &content_reader);
+        void removeGroupMember(const std::shared_ptr <libzephir::Group>& group, Response &res, const std::string & identityId);
 
+        void upsertGroup(const Request &req, Response &res, const ContentReader &content_reader);
         void upsertIdentity(const Request &req, Response &res, const ContentReader &content_reader);
         void upsertPolicy(const Request &req, Response &res, const ContentReader &content_reader);
 
@@ -83,7 +87,7 @@ namespace zephir::server {
                 this->upsertIdentity(req, res, content_reader);
             });
 
-            this->register_groups_actions(srv);
+            this->registerGroupsActions(srv);
 
             auto server_port = 8091;
             auto server_port_str = std::getenv("SERVE_PORT");

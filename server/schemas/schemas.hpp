@@ -10,6 +10,7 @@ namespace zephir::json_schema {
     namespace internal {
         extern const char *addGroupMember;
         extern const char *allowedSchema;
+        extern const char *upsertGroupSchema;
         extern const char *upsertIdentitySchema;
         extern const char *upsertPolicySchema;
     }
@@ -21,6 +22,7 @@ namespace zephir::json_schema {
 
     extern valijson::Schema sAddGroupMember;
     extern valijson::Schema sAllowed;
+    extern valijson::Schema sGroupUpsert;
     extern valijson::Schema sIdentityUpsert;
     extern valijson::Schema sPolicyUpsert;
     extern init__schemas s;

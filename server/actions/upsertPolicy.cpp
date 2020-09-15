@@ -4,7 +4,7 @@
 namespace zephir::server {
     void Server::upsertPolicy(const Request &req, Response &res, const ContentReader &content_reader) {
         using namespace nlohmann;
-        DECODE_AND_VALIDATE_JSON(j, zephir::json_schema::sPolicyUpsert, res)
+        DECODE_AND_VALIDATE_JSON(j, zephir::json_schema::sPolicyUpsert, res, content_reader)
 
         std::string id;
         libzephir::PolicyEffect e;
@@ -15,7 +15,7 @@ namespace zephir::server {
             resources = j["resources"].get<std::vector<std::string>>();
             e = j["effect"].get<std::string>() == "ALLOW" ? libzephir::ALLOW : libzephir::DENY;
         } catch (json::type_error & ex) {
-            invalid_request_handler("Invalid data", res);
+            invalidRequestHandler("Invalid data", res);
             return;
         }
 

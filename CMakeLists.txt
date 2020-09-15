@@ -40,11 +40,15 @@ target_sources(zephir PRIVATE
     server/schemas/schemas.cpp
     server/schemas/addGroupMember.json.cpp
     server/schemas/allowed.json.cpp
+    server/schemas/upsert_group.json.cpp
     server/schemas/upsert_identity.json.cpp
     server/schemas/upsert_policy.json.cpp
     server/actions/groups/addGroupMember.cpp
     server/actions/groups/register-actions.cpp
+    server/actions/groups/removeGroupMember.cpp
+    server/actions/groups/upsertGroup.cpp
     server/actions/allowed.cpp
+    server/actions/decodePolicy.cpp
     server/actions/upsertIdentity.cpp
     server/actions/upsertPolicy.cpp
 )

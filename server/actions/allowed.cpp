@@ -4,7 +4,7 @@
 namespace zephir::server {
     void Server::allowedAction(const Request &req, Response &res, const ContentReader &content_reader) {
         using namespace nlohmann;
-        DECODE_AND_VALIDATE_JSON(j, zephir::json_schema::sAllowed, res);
+        DECODE_AND_VALIDATE_JSON(j, zephir::json_schema::sAllowed, res, content_reader);
 
         std::optional<std::string> resource(std::nullopt);
         try {
@@ -18,7 +18,7 @@ namespace zephir::server {
             identity = j["subject"].get<std::string>();
             action = j["action"].get<std::string>();
         } catch (json::type_error & ex) {
-            invalid_request_handler("Invalid data", res);
+            invalidRequestHandler("Invalid data", res);
             return;
         }
 

@@ -2,12 +2,12 @@
 
 #include <nlohmann/json.hpp>
 
-#define DECODE_AND_VALIDATE_JSON(json_var, schema, res) \
+#define DECODE_AND_VALIDATE_JSON(json_var, schema, res, content_reader) \
         nlohmann::json json_var; \
         try { \
             json_var = json_reader(content_reader); \
         } catch (json::parse_error& ex) { \
-            this->invalid_request_handler("Invalid body", res); \
+            this->invalidRequestHandler("Invalid body", res); \
             return; \
         } \
         \
@@ -21,6 +21,6 @@
                 errors.push_back(error.description); \
             } \
             \
-            this->invalid_request_handler(errors, res); \
+            this->invalidRequestHandler(errors, res); \
             return; \
         }

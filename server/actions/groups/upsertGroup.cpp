@@ -1,20 +1,20 @@
-#include "../Server.hpp"
-#include "util.hpp"
-#include "../../libzephir/EmptyPolicy.hpp"
+#include "../../Server.hpp"
+#include "../util.hpp"
+#include "../../../libzephir/EmptyPolicy.hpp"
 
 namespace zephir::server {
-    void Server::upsertIdentity(const Request &req, Response &res, const ContentReader &content_reader) {
+    void Server::upsertGroup(const Request &req, Response &res, const ContentReader &content_reader) {
         using namespace nlohmann;
-        DECODE_AND_VALIDATE_JSON(j, zephir::json_schema::sIdentityUpsert, res, content_reader)
+        DECODE_AND_VALIDATE_JSON(j, zephir::json_schema::sGroupUpsert, res, content_reader)
 
         const nlohmann::json & embed = j["inline_policy"].get<nlohmann::json>();
 
         std::shared_ptr<libzephir::Policy> embeddedPolicy = nullptr;
-        std::string id;
+        std::string name;
         std::vector<std::string> policies;
 
         try {
-            id = j["id"].get<std::string>();
+            name = j["name"].get<std::string>();
             policies = j["linked_policies"].get<std::vector<std::string>>();
 
             if (! embed.is_null()) {
@@ -25,16 +25,16 @@ namespace zephir::server {
             return;
         }
 
-        libzephir::Identity i(id, embeddedPolicy != nullptr ? embeddedPolicy : std::make_shared<libzephir::EmptyPolicy>());
+        libzephir::Group g(name, embeddedPolicy != nullptr ? embeddedPolicy : std::make_shared<libzephir::EmptyPolicy>());
         for (auto & policyId : policies) {
             auto p = this->m_manager.getPolicy(policyId);
             if (nullptr != p) {
-                i.addPolicy(p);
+                g.addPolicy(p);
             }
         }
 
-        this->m_manager.save(i);
+        this->m_manager.save(g);
 
-        res.set_content(i.toJsonString(), "application/json");
+        res.set_content(g.toJsonString(), "application/json");
     }
 }

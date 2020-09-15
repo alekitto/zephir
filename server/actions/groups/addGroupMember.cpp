@@ -2,15 +2,15 @@
 #include "../util.hpp"
 
 namespace zephir::server {
-    void Server::addGroupMember(std::shared_ptr <libzephir::Group> group, Response &res, const ContentReader &content_reader) {
+    void Server::addGroupMember(const std::shared_ptr <libzephir::Group>& group, Response &res, const ContentReader &content_reader) {
         using namespace nlohmann;
-        DECODE_AND_VALIDATE_JSON(j, zephir::json_schema::sIdentityUpsert, res)
+        DECODE_AND_VALIDATE_JSON(j, zephir::json_schema::sAddGroupMember, res, content_reader)
 
         std::shared_ptr<libzephir::Identity> identity;
         try {
             identity = this->m_manager.getIdentity(j["id"].get<std::string>());
         } catch (json::type_error & ex) {
-            invalid_request_handler("Invalid data", res);
+            invalidRequestHandler("Invalid data", res);
             return;
         }
 
