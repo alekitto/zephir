@@ -8,17 +8,20 @@ namespace zephir::server {
         DECODE_AND_VALIDATE_JSON(j, zephir::json_schema::sGroupUpsert, res, content_reader)
 
         const nlohmann::json & embed = j["inline_policy"].get<nlohmann::json>();
+        const nlohmann::json & jPolicies = j["linked_policies"].get<nlohmann::json>();
 
         std::shared_ptr<libzephir::Policy> embeddedPolicy = nullptr;
         std::string name;
         std::vector<std::string> policies;
 
         try {
-            name = j["name"].get<std::string>();
-            policies = j["linked_policies"].get<std::vector<std::string>>();
-
+            name = j["id"].get<std::string>();
             if (! embed.is_null()) {
                 embeddedPolicy = Server::decodePolicy(embed);
+            }
+
+            if (! jPolicies.is_null()) {
+                policies = jPolicies.get<std::vector<std::string>>();
             }
         } catch (json::type_error & ex) {
             invalidRequestHandler("Invalid data", res);

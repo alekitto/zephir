@@ -209,6 +209,13 @@ void PostgresManager::save(const Group &g) {
         );
     }
 
+    this->db(::sqlpp::remove_from(groupIdentity).where(groupIdentity.group_id == g.name));
+    for (auto & m : g.getIdentities()) {
+        this->db(::sqlpp::insert_into(groupIdentity)
+             .set(groupIdentity.group_id = g.name, groupIdentity.identity_id = m->id)
+        );
+    }
+
     this->db.commit_transaction();
 
     this->m_cache.groups.clear();

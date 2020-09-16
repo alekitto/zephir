@@ -19,7 +19,7 @@ namespace libzephir::identity {
             m_identities({}) {}
 
         const std::vector<std::shared_ptr<Identity>> &
-        getIdentities() {
+        getIdentities() const {
             return this->m_identities;
         }
 

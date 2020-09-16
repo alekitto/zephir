@@ -23,9 +23,7 @@ namespace zephir::json_schema::internal {
         }
     ],
     "required": [
-        "id",
-        "linked_policies",
-        "inline_policy"
+        "id"
     ],
     "properties": {
         "id": {
