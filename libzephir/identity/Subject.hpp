@@ -1,10 +1,3 @@
-#pragma once
-
-#include <functional>
-
-#include "Role.hpp"
-#include "../Policy.hpp"
-
 namespace libzephir::identity {
     class Subject : public Role {
     protected:

@@ -1,7 +1,3 @@
-#pragma once
-
-#include <exception>
-
 namespace libzephir::exception {
     class UnknownPolicyVersionException : public std::exception {
         int _version;

@@ -1,9 +1,3 @@
-#pragma once
-
-#include <string>
-#include <utility>
-#include "Identity.hpp"
-
 namespace libzephir::identity {
     class Group : public Subject {
         std::string m_name;

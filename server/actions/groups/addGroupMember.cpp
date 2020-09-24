@@ -1,5 +1,4 @@
-#include "../../Server.hpp"
-#include "../util.hpp"
+#include "../../stdafx.hpp"
 
 namespace zephir::server {
     void Server::addGroupMember(const std::shared_ptr <libzephir::Group>& group, Response &res, const ContentReader &content_reader) {

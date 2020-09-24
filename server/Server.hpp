@@ -1,10 +1,3 @@
-#pragma once
-
-#include <httplib.h>
-#include <spdlog/spdlog.h>
-#include "../libzephir/storage/Manager.hpp"
-#include "schemas/schemas.hpp"
-
 namespace zephir::server {
     using namespace nlohmann;
     using namespace libzephir::storage;

@@ -1,12 +1,3 @@
-#pragma once
-
-#include <memory>
-#include <regex>
-#include <vector>
-
-#include "CompiledPolicy.h"
-#include "../cache/LruCache.hpp"
-
 namespace libzephir {
     class Policy;
 

@@ -1,5 +1,4 @@
-#include "../Server.hpp"
-#include "../../libzephir/EmptyPolicy.hpp"
+#include "../stdafx.hpp"
 
 namespace zephir::server {
     std::shared_ptr<libzephir::Policy>

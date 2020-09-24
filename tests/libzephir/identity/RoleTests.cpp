@@ -1,6 +1,4 @@
 #include <gtest/gtest.h>
-#include <memory>
-#include "../../../libzephir/identity/Role.hpp"
 
 using namespace libzephir;
 using namespace libzephir::identity;

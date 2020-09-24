@@ -1,15 +1,3 @@
-#pragma once
-
-#include <cstdlib>
-#include <mutex>
-#include <uriparser/Uri.h>
-#include <sqlpp11/sqlpp11.h>
-#include <sqlpp11/postgresql/postgresql.h>
-#include "../../Manager.hpp"
-#include "../../exception/InvalidDsnException.h"
-#include "tables.hpp"
-#include "../../../EmptyPolicy.hpp"
-
 namespace libzephir::storage::sql::postgres {
     namespace sql = ::sqlpp::postgresql;
 

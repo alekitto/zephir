@@ -1,8 +1,3 @@
-#pragma once
-
-#include <memory>
-#include "Policy.hpp"
-
 namespace libzephir {
     class EmptyPolicy : public Policy {
     public:

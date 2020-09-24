@@ -1,7 +1,3 @@
-#pragma once
-
-#include <exception>
-
 namespace libzephir::exception {
     class UnsupportedStorageDsn : public std::exception {
     public:

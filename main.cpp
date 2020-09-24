@@ -1,9 +1,4 @@
-#include <iostream>
-#include <sqlpp11/exception.h>
-#include <spdlog/spdlog.h>
-
-#include "libzephir/storage/Manager.hpp"
-#include "server/Server.hpp"
+#include "server/stdafx.hpp"
 
 int main() {
     using namespace libzephir;

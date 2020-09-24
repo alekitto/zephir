@@ -1,9 +1,3 @@
-#pragma once
-
-#include <memory>
-#include <optional>
-#include "PartialPolicy.hpp"
-
 namespace libzephir {
     class Policy;
 

@@ -1,5 +1,4 @@
-#include "../../Server.hpp"
-#include "../util.hpp"
+#include "../../stdafx.hpp"
 
 namespace zephir::server {
     void Server::removeGroupMember(const std::shared_ptr <libzephir::Group>& group, Response &res, const std::string & identityId) {

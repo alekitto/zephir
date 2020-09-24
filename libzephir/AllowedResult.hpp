@@ -1,9 +1,3 @@
-#pragma once
-
-#include <vector>
-
-#include "Policy.hpp"
-
 namespace libzephir {
     enum AllowedOutcome {
         DENIED = -1,

@@ -1,4 +1,4 @@
-#include "Policy.hpp"
+#include <stdafx.h>
 
 namespace libzephir {
     void Policy::compile() {

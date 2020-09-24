@@ -1,5 +1,4 @@
-#include "MatchResult.hpp"
-#include "Policy.hpp"
+#include <stdafx.h>
 
 namespace libzephir {
     void MatchResult::_update() {

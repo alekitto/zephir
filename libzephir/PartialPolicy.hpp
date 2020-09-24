@@ -1,16 +1,3 @@
-#pragma once
-
-#include <memory>
-#include <optional>
-#include <string>
-#include <utility>
-#include <vector>
-
-#include <nlohmann/json.hpp>
-
-#include "exception/exceptions.h"
-#include "Effect.hpp"
-
 namespace libzephir {
     typedef std::vector<std::string> string_vector;
 

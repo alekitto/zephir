@@ -1,4 +1,4 @@
-#include "PostgresManager.hpp"
+#include <stdafx.h>
 
 using namespace libzephir::storage::sql::postgres;
 using namespace libzephir;
@@ -229,10 +229,10 @@ void PostgresManager::save(const Identity &i) {
 
     this->db.start_transaction();
     if (embeddedPolicy.complete()) {
-        Policy persistingPolicy(embeddedPolicy.version, embedded_policy_id, embeddedPolicy.effect,
-            embeddedPolicy.actions(), embeddedPolicy.resources());
+        Policy persistingPolicy(embeddedPolicy.version, embedded_policy_id, embeddedPolicy.effect, embeddedPolicy.actions(), embeddedPolicy.resources());
         this->save(persistingPolicy);
     } else {
+        this->db(::sqlpp::update(identity).set(identity.policy_id = ::sqlpp::null).where(identity.id == i.id));
         this->db(::sqlpp::remove_from(policy).where(policy.id == embedded_policy_id));
     }
 

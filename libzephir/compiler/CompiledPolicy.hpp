@@ -1,9 +1,3 @@
-#pragma once
-
-#include <optional>
-#include <regex>
-#include <vector>
-
 namespace libzephir::compiler {
     typedef const std::vector<std::regex> regex_vec;
 

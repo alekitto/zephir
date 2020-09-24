@@ -1,7 +1,3 @@
-#pragma once
-
-#include <exception>
-
 namespace libzephir::exception {
     class ActionsCannotBeEmptyException : public std::exception {
     public:

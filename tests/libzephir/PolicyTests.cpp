@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include "../../libzephir/Policy.hpp"
 
 using namespace libzephir;
 using namespace libzephir::exception;

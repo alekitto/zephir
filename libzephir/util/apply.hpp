@@ -1,7 +1,3 @@
-#pragma once
-
-#include <vector>
-
 namespace libzephir::util {
     template<typename C, typename F>
     auto apply(C &&container, F &&func) {

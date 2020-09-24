@@ -1,5 +1,4 @@
-#include "Manager.hpp"
-#include "sql/postgres/PostgresManager.hpp"
+#include <stdafx.h>
 
 namespace libzephir::storage {
     std::shared_ptr<Manager>

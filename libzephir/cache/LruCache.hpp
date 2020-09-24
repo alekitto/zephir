@@ -1,11 +1,3 @@
-#pragma once
-
-#include <list>
-#include <map>
-#include <tuple>
-
-#include "../lock/Guard.hpp"
-
 namespace libzephir::cache {
     // a cache which evicts the least recently used item when it is full
     template<class K, class V>

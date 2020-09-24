@@ -1,5 +1,4 @@
-#include <string>
-#include <regex>
+#include <stdafx.h>
 
 namespace libzephir::util {
     // Returns a RegExp which is the equivalent of the glob pattern.

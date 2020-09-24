@@ -1,4 +1,6 @@
-cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/CMakePCHCompiler)
+
 project(zephir)
 
 add_custom_target(install_deps ALL
@@ -11,7 +13,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/extern ${CMAKE_MODULE_PATH})
 
 add_definitions("-std=c++17")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${CMAKE_BINARY_DIR}/_deps/extern_sqlpp11_connector_postgresql-src/include -I${CMAKE_BINARY_DIR}/_deps/extern_valijson-src/include")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${CMAKE_SOURCE_DIR}/libzephir -I${CMAKE_BINARY_DIR}/_deps/extern_sqlpp11_connector_postgresql-src/include -I${CMAKE_BINARY_DIR}/_deps/extern_valijson-src/include")
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 endif()
@@ -31,6 +33,8 @@ add_library(libzephir STATIC
     libzephir/storage/sql/postgres/PostgresManager.cpp
 )
 set_target_properties(libzephir PROPERTIES PREFIX "")
+target_precompile_headers(libzephir PUBLIC libzephir/stdafx.h)
+
 add_dependencies(libzephir install_deps)
 
 add_executable(zephir "")
@@ -54,5 +58,6 @@ target_sources(zephir PRIVATE
 )
 
 target_link_libraries(zephir libzephir "sqlpp11-connector-postgresql" ${CONAN_LIBS})
+target_precompile_headers(zephir PUBLIC libzephir/stdafx.h server/stdafx.hpp)
 
 add_subdirectory(tests)

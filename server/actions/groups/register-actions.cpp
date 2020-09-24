@@ -1,4 +1,4 @@
-#include "../../Server.hpp"
+#include "../../stdafx.hpp"
 
 namespace zephir::server {
     void Server::registerGroupsActions(httplib::Server &srv) {

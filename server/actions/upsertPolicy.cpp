@@ -1,5 +1,4 @@
-#include "../Server.hpp"
-#include "util.hpp"
+#include "../stdafx.hpp"
 
 namespace zephir::server {
     void Server::upsertPolicy(const Request &req, Response &res, const ContentReader &content_reader) {

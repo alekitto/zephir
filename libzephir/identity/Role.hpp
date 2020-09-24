@@ -1,10 +1,3 @@
-#pragma once
-
-#include <memory>
-#include <vector>
-#include "../AllowedResult.hpp"
-#include "../Policy.hpp"
-
 namespace libzephir::identity {
     class Role {
         std::vector<std::shared_ptr<Policy>> _linkedPolicies;

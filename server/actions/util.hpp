@@ -1,7 +1,3 @@
-#pragma once
-
-#include <nlohmann/json.hpp>
-
 #define DECODE_AND_VALIDATE_JSON(json_var, schema, res, content_reader) \
         nlohmann::json json_var; \
         try { \

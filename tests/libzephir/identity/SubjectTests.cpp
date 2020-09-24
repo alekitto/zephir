@@ -1,6 +1,4 @@
 #include <gtest/gtest.h>
-#include "../../../libzephir/identity/Subject.hpp"
-#include "../../../libzephir/EmptyPolicy.hpp"
 
 using namespace libzephir;
 using namespace libzephir::identity;

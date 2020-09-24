@@ -1,7 +1,4 @@
-#include "CompiledPolicy.h"
-#include "Compiler.h"
-#include "../Policy.hpp"
-#include "../util/util.h"
+#include <stdafx.h>
 
 namespace libzephir::compiler {
     std::shared_ptr<CompiledPolicy> Compiler::compile(Policy &policy) {

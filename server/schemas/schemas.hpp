@@ -1,5 +1,3 @@
-#pragma once
-
 #include <valijson/adapters/nlohmann_json_adapter.hpp>
 #include <valijson/utils/nlohmann_json_utils.hpp>
 #include <valijson/schema.hpp>

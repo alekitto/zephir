@@ -1,11 +1,3 @@
-#pragma once
-
-#include <memory>
-
-#include "compiler/Compiler.h"
-#include "MatchResult.hpp"
-#include "PartialPolicy.hpp"
-
 namespace libzephir {
     using namespace compiler;
 

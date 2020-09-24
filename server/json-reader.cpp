@@ -1,6 +1,4 @@
-#include <string>
-#include <nlohmann/json.hpp>
-#include <httplib.h>
+#include "stdafx.hpp"
 
 namespace zephir::server {
     using namespace nlohmann;

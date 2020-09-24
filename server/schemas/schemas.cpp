@@ -1,5 +1,3 @@
-#include "schemas.hpp"
-
 #define POPULATE_SCHEMA(cSchema, schema)  { \
         nlohmann::json __document__; \
         valijson::SchemaParser __parser; \

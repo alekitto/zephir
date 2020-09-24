@@ -1,12 +1,3 @@
-#pragma once
-
-#include <memory>
-#include <string>
-#include "../cache/LruCache.hpp"
-#include "../identity/Identity.hpp"
-#include "../identity/Group.hpp"
-#include "../Policy.hpp"
-
 namespace libzephir {
     using namespace cache;
     using namespace identity;
