@@ -73,7 +73,7 @@ TEST(SubjectTest, AllowedShouldWork) {
     ASSERT_EQ(0, result->partials.size());
 
     result = subject.allowed("FooAction", "urn:resource:test-class-deny:test-id");
-    ASSERT_EQ(ABSTAIN, result->outcome);
+    ASSERT_EQ(DENIED, result->outcome);
     ASSERT_EQ(0, result->partials.size());
 
     result = subject.allowed("TestAction", std::nullopt);

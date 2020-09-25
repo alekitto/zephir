@@ -6,18 +6,42 @@ namespace libzephir {
     };
 
     class AllowedResult {
+        friend class outcome;
         AllowedOutcome _outcome;
         std::vector<PartialPolicy> _partials;
 
     public:
-        const AllowedOutcome &outcome;
+        const class outcome {
+            const AllowedOutcome & value;
+            const AllowedResult & result;
+
+            [[nodiscard]] libzephir::AllowedOutcome computeOutcome() const {
+                auto rOutcome = this->result._outcome;
+                if (ABSTAIN == rOutcome && this->result._partials.empty()) {
+                    rOutcome = DENIED;
+                }
+
+                return rOutcome;
+            }
+
+            public:
+                outcome(const libzephir::AllowedOutcome & v, const libzephir::AllowedResult & r) : value(v), result(r) {}
+
+                operator libzephir::AllowedOutcome () const { return this->computeOutcome(); }
+                operator int () const { return (int) this->computeOutcome(); }
+                operator long long int () const { return (long long int) this->computeOutcome(); }
+
+                bool operator == (libzephir::AllowedOutcome other) const {
+                    return this->computeOutcome() == other;
+                }
+        } outcome;
         const std::vector<PartialPolicy> &partials;
 
         AllowedResult(AllowedOutcome pOutcome) : AllowedResult(pOutcome, {}) {}
         AllowedResult(AllowedOutcome pOutcome, std::vector<PartialPolicy> partials) :
             _outcome(pOutcome),
             _partials(partials),
-            outcome(_outcome),
+            outcome(_outcome, *this),
             partials(_partials) {}
 
         std::string toJsonString() {
@@ -28,11 +52,7 @@ namespace libzephir {
                 partialsJson.push_back(partial.toJson());
             }
 
-            auto rOutcome = this->_outcome;
-            if (ABSTAIN == rOutcome && this->partials.size() == 0) {
-                rOutcome = DENIED;
-            }
-
+            auto rOutcome = (const AllowedOutcome) this->outcome;
             json j = {
                 {"outcome",  rOutcome == ALLOWED ? "ALLOWED" : rOutcome == ABSTAIN ? "ABSTAIN" : "DENIED"},
                 {"partials", partialsJson}
@@ -45,10 +65,9 @@ namespace libzephir {
             if (other._outcome == DENIED) {
                 this->_outcome = DENIED;
                 this->_partials = {};
-                return;
             }
 
-            if (this->_outcome != ABSTAIN) {
+            if (this->_outcome == DENIED) {
                 return;
             }
 

@@ -52,7 +52,8 @@ TEST(RoleTest, PoliciesCanBeRemoved) {
 TEST(RoleTest, AllowedShouldWork) {
     Role role = ConcreteRole({
         std::make_shared<Policy>(VERSION_1, "RoleTestPolicy", ALLOW, string_vector{ "TestAction" }),
-        std::make_shared<Policy>(VERSION_1, "RoleTestPolicy2", DENY, string_vector{ "TestAction" }, string_vector{ "urn:resource:test-class-deny:*" })
+        std::make_shared<Policy>(VERSION_1, "RoleTestPolicy2", DENY, string_vector{ "TestAction" }, string_vector{ "urn:resource:test-class-deny:*" }),
+        std::make_shared<Policy>(VERSION_1, "RoleTestPolicy3", ALLOW, string_vector{ "FooAction" }, string_vector{ "urn:resource:test-class:*" }),
     });
 
     auto result = role.allowed("TestAction", "urn:resource:test-class-allow:test-id");
@@ -64,8 +65,12 @@ TEST(RoleTest, AllowedShouldWork) {
     ASSERT_EQ(0, result->partials.size());
 
     result = role.allowed("FooAction", "urn:resource:test-class-deny:test-id");
-    ASSERT_EQ(ABSTAIN, result->outcome);
+    ASSERT_EQ(DENIED, result->outcome);
     ASSERT_EQ(0, result->partials.size());
+
+    result = role.allowed("FooAction", std::nullopt);
+    ASSERT_EQ(ABSTAIN, result->outcome);
+    ASSERT_EQ(1, result->partials.size());
 
     result = role.allowed("TestAction", std::nullopt);
     ASSERT_EQ(ALLOWED, result->outcome);

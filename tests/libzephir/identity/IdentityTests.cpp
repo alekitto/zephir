@@ -20,6 +20,11 @@ TEST(IdentityTest, AllowShouldCheckInlinePolicy) {
         string_vector{"urn:test-resource:id"}
     ));
 
-    auto result = i.allowed("test:identity", std::nullopt);
-    ASSERT_EQ(AllowedOutcome::ABSTAIN, result->outcome);
+    auto result1 = i.allowed("test:identity", "urn:test-resource:id");
+    ASSERT_EQ(AllowedOutcome::ALLOWED, result1->outcome);
+    ASSERT_EQ(0, result1->partials.size());
+
+    auto result2 = i.allowed("test:identity", std::nullopt);
+    ASSERT_EQ(AllowedOutcome::ABSTAIN, result2->outcome);
+    ASSERT_EQ(1, result2->partials.size());
 }

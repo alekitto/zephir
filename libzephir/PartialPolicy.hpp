@@ -41,8 +41,17 @@ namespace libzephir {
         PartialPolicy(PolicyVersion pVersion, PolicyEffect pEffect) :
             PartialPolicy(pVersion, pEffect, std::nullopt, std::nullopt) {}
 
+        PartialPolicy(PolicyVersion pVersion, PolicyEffect pEffect, const string_vector& actions)
+            : PartialPolicy(pVersion, pEffect, std::make_optional(actions), std::nullopt) {}
+
         PartialPolicy(PolicyVersion pVersion, PolicyEffect pEffect, std::optional<string_vector> actions)
-            : PartialPolicy(pVersion, pEffect, actions, std::nullopt) {}
+            : PartialPolicy(pVersion, pEffect, std::move(actions), std::nullopt) {}
+
+        PartialPolicy(PolicyVersion pVersion, PolicyEffect pEffect, std::optional<string_vector> actions, const string_vector& resources)
+            : PartialPolicy(pVersion, pEffect, std::move(actions), std::make_optional(resources)) {}
+
+        PartialPolicy(PolicyVersion pVersion, PolicyEffect pEffect, const string_vector& actions, const string_vector& resources)
+                : PartialPolicy(pVersion, pEffect, std::make_optional(actions), std::make_optional(resources)) {}
 
         PartialPolicy(PolicyVersion pVersion, PolicyEffect pEffect, std::optional<string_vector> actions, std::optional<string_vector> resources) :
             _effect(pEffect),

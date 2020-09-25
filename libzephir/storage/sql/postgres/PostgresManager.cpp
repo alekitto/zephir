@@ -228,33 +228,24 @@ void PostgresManager::save(const Identity &i) {
     const Policy & embeddedPolicy = i.getInlinePolicy();
 
     this->db.start_transaction();
+    this->db(::sqlpp::update(identity).set(identity.policy_id = ::sqlpp::null).where(identity.id == i.id));
+    this->db(::sqlpp::remove_from(policy).where(policy.id == embedded_policy_id));
+
     if (embeddedPolicy.complete()) {
         Policy persistingPolicy(embeddedPolicy.version, embedded_policy_id, embeddedPolicy.effect, embeddedPolicy.actions(), embeddedPolicy.resources());
         this->save(persistingPolicy);
-    } else {
-        this->db(::sqlpp::update(identity).set(identity.policy_id = ::sqlpp::null).where(identity.id == i.id));
-        this->db(::sqlpp::remove_from(policy).where(policy.id == embedded_policy_id));
     }
 
     auto row = this->db(::sqlpp::select(identity.id).from(identity).where(identity.id == i.id));
-    if (! row.empty()) {
-        auto update = ::sqlpp::update(identity)
-            .where(identity.id == i.id);
-
-        if (embeddedPolicy.complete()) {
-            this->db(update.set(identity.policy_id = embedded_policy_id));
-        } else {
-            this->db(update.set(identity.policy_id = ::sqlpp::null));
-        }
-    } else {
+    if (row.empty()) {
         auto insert = ::sqlpp::insert_into(identity).columns(identity.id, identity.policy_id);
-        if (embeddedPolicy.complete()) {
-            insert.values.add(identity.id = i.id, identity.policy_id = embedded_policy_id);
-        } else {
-            insert.values.add(identity.id = i.id, identity.policy_id = ::sqlpp::null);
-        }
+        insert.values.add(identity.id = i.id, identity.policy_id = ::sqlpp::null);
 
         this->db(insert);
+    }
+
+    if (embeddedPolicy.complete()) {
+        this->db(::sqlpp::update(identity).set(identity.policy_id = embedded_policy_id).where(identity.id == i.id));
     }
 
     this->db(::sqlpp::remove_from(identityPolicy).where(identityPolicy.identity_id == i.id));
