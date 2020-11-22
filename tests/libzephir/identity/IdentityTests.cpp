@@ -28,3 +28,24 @@ TEST(IdentityTest, AllowShouldCheckInlinePolicy) {
     ASSERT_EQ(AllowedOutcome::ABSTAIN, result2->outcome);
     ASSERT_EQ(1, result2->partials.size());
 }
+
+TEST(IdentityTest, ShouldCheckInlineAndLinkedPolicies) {
+    Identity i = Identity("IdentityTestShouldCheckInlineAndLinkedPolicies", std::make_shared<Policy>(
+        VERSION_1,
+        "TestInlinePolicyOnIdentity",
+        ALLOW,
+        string_vector{"test:not-identity"},
+        string_vector{"urn:test-resource:id"}
+    ));
+
+    i.addPolicy(std::make_shared<Policy>(
+        VERSION_1,
+        "TestLinkedPolicyOnIdentity",
+        ALLOW,
+        string_vector{"test:identity"},
+        string_vector{"*"}
+    ));
+
+    auto result = i.allowed("test:identity", "urn:test:zephir:identity");
+    ASSERT_EQ(AllowedOutcome::ALLOWED, result->outcome);
+}

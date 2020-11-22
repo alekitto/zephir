@@ -29,7 +29,7 @@ namespace libzephir {
 
         void action(bool r) { m_action = r; }
         void resource(bool r) { m_resource = r; }
-        std::unique_ptr<PartialPolicy> &getPartial() { return m_partial; }
+        std::unique_ptr<PartialPolicy> &getPartial() { return this->m_partial; }
 
         void _update();
     };

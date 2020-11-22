@@ -6,7 +6,7 @@ int main() {
 
     const char* logLevel = std::getenv("LOG_LEVEL");
     if (logLevel == nullptr) {
-        logLevel = "debug";
+        logLevel = "trace";
     }
 
     spdlog::set_level(spdlog::level::from_str(logLevel));
