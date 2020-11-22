@@ -278,5 +278,7 @@ void PostgresManager::save(const Policy &p) {
     }
 
     this->m_cache.policies.clear();
+    this->m_cache.identities.clear();
+    this->m_cache.groups.clear();
     Compiler::getInstance().clearCache();
 }
