@@ -9,9 +9,44 @@ on:
             - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v1
+              with:
+                  fetch-depth: '0'
+
+            - uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: nightly
+                  override: true
+
+            - name: Cache
+              uses: actions/cache@v1
+              with:
+                  path: |
+                      ~/.cargo/registry
+                      ~/.cargo/git
+                      target
+                  key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock') }}
+
+            - uses: actions-rs/cargo@v1
+              with:
+                  command: test
+                  args: --all-features --no-fail-fast
+              env:
+                  CARGO_INCREMENTAL: '0'
+                  RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
+                  RUSTDOCFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests'
+
+            - uses: actions-rs/grcov@v0.1
+            - uses: codecov/codecov-action@v1
+
     build:
         name: Build docker image
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-latest
         steps:
             - name: Check out the repo
               uses: actions/checkout@v2
@@ -57,17 +92,25 @@ jobs:
                   username: ${{ secrets.REGISTRY_USERNAME }}
                   password: ${{ secrets.REGISTRY_PASSWORD }}
 
+            - name: Cache Docker layers
+              uses: actions/cache@v2
+              with:
+                  path: /tmp/.buildx-cache
+                  key: ${{ runner.os }}-buildx-${{ github.sha }}
+                  restore-keys: |
+                      ${{ runner.os }}-buildx-
+
             - name: Build and push
               id: docker_build
               uses: docker/build-push-action@v2
               with:
                   context: .
                   file: ./Dockerfile
-                  platforms: linux/amd64
+                  platforms: linux/amd64,linux/arm64
                   push: ${{ github.event_name != 'pull_request' }}
                   tags: ${{ steps.prep.outputs.tags }}
                   cache-from: type=local,src=/tmp/.buildx-cache
-                  cache-to: type=local,dest=/tmp/.buildx-cache
+                  cache-to: type=local,dest=/tmp/.buildx-cache-new
                   labels: |
                       org.opencontainers.image.title=${{ github.event.repository.name }}
                       org.opencontainers.image.description=${{ github.event.repository.description }}
@@ -77,3 +120,8 @@ jobs:
                       org.opencontainers.image.created=${{ steps.prep.outputs.created }}
                       org.opencontainers.image.revision=${{ github.sha }}
                       org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}
+
+            - name: Move cache
+              run: |
+                  rm -rf /tmp/.buildx-cache
+                  mv /tmp/.buildx-cache-new /tmp/.buildx-cache
