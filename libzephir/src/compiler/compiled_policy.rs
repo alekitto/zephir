@@ -29,9 +29,10 @@ fn redis_obj_to_regex(obj: &HashMap<String, String>, key: &str) -> Result<Vec<Re
             return Err(Error::new(ErrorKind::UnwrapNoneValueError, NoneError {}));
         }
 
-        result.push(RegexBuilder::new()
-            .jit_if_available(true)
-            .build(r.unwrap())?
+        result.push(
+            RegexBuilder::new()
+                .jit_if_available(true)
+                .build(r.unwrap())?,
         );
     }
 
@@ -84,7 +85,11 @@ impl CompiledPolicy {
         for regex in &self.actions {
             let is_match = regex.is_match(action_str);
             match is_match {
-                Err(e) => warn!("Regex {} caused an error: {}", regex.as_str(), e.to_string()),
+                Err(e) => warn!(
+                    "Regex {} caused an error: {}",
+                    regex.as_str(),
+                    e.to_string()
+                ),
                 Ok(result) => {
                     if result {
                         trace!("Regex {} matches the action {}", regex.as_str(), action);
@@ -134,7 +139,11 @@ impl CompiledPolicy {
                 for regex in &self.resources {
                     let is_match = regex.is_match(res);
                     match is_match {
-                        Err(e) => warn!("Regex {} caused an error: {}", regex.as_str(), e.to_string()),
+                        Err(e) => warn!(
+                            "Regex {} caused an error: {}",
+                            regex.as_str(),
+                            e.to_string()
+                        ),
                         Ok(regex_matching) => {
                             if regex_matching {
                                 trace!("Regex {} matches the resource {}", regex.as_str(), string);
@@ -230,7 +239,7 @@ impl Cacheable for CompiledPolicy {
 
         match CompiledPolicy::from_redis_obj(obj) {
             Err(err) => Err(CacheError::Other(err.to_string())),
-            Ok(res) => Ok(res)
+            Ok(res) => Ok(res),
         }
     }
 

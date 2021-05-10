@@ -109,17 +109,11 @@ impl ToJson for PartialPolicy {
         result.insert(String::from("effect"), Value::from(&self.effect));
 
         if let Some(actions) = &self.actions {
-            result.insert(
-                String::from("actions"),
-                Value::from(actions.as_slice()),
-            );
+            result.insert(String::from("actions"), Value::from(actions.as_slice()));
         }
 
         if let Some(resources) = &self.resources {
-            result.insert(
-                String::from("resources"),
-                Value::from(resources.as_slice()),
-            );
+            result.insert(String::from("resources"), Value::from(resources.as_slice()));
         }
 
         result
@@ -207,7 +201,10 @@ impl ToJson for CompletePolicy {
                 _ => "DENY",
             }),
         );
-        result.insert(String::from("actions"), Value::from(self.actions.as_slice()));
+        result.insert(
+            String::from("actions"),
+            Value::from(self.actions.as_slice()),
+        );
         result.insert(
             String::from("resources"),
             Value::from(self.resources.as_slice()),

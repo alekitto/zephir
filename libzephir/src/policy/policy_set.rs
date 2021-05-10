@@ -49,7 +49,7 @@ impl<T: Policy> PolicySet<T> {
             .iter_mut()
             .find(|ref p| p.id().cmp(policy.id()) == Ordering::Equal)
         {
-            Some(_) => { }
+            Some(_) => {}
             None => policies.push(policy),
         }
     }

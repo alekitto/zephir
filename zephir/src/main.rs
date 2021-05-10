@@ -7,9 +7,9 @@ mod handlers;
 
 use actix_web::middleware::Logger;
 use actix_web::{App, HttpServer};
-use sqlx::postgres::PgPoolOptions;
-use libzephir::storage::StorageManager;
 use libzephir::err::{Error, ErrorKind};
+use libzephir::storage::StorageManager;
+use sqlx::postgres::PgPoolOptions;
 
 fn get_serve_port() -> u16 {
     let serve_port = std::env::var("SERVE_PORT");
@@ -29,12 +29,18 @@ fn get_db_connection_string() -> Result<String, Error> {
     match std::env::var("DSN") {
         Result::Ok(dsn) => {
             if dsn.is_empty() {
-                Err(Error::new(ErrorKind::UnknownError, "Database DSN is empty. Please set DSN env var to a non-empty value"))
+                Err(Error::new(
+                    ErrorKind::UnknownError,
+                    "Database DSN is empty. Please set DSN env var to a non-empty value",
+                ))
             } else {
-                Ok(dsn.clone())
+                Ok(dsn)
             }
         }
-        Result::Err(_) => Err(Error::new(ErrorKind::UnknownError, "Database DSN not set. Please set DSN env var")),
+        Result::Err(_) => Err(Error::new(
+            ErrorKind::UnknownError,
+            "Database DSN not set. Please set DSN env var",
+        )),
     }
 }
 

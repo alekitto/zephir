@@ -111,7 +111,8 @@ mod tests {
                     vec!["get_second"]
                 )
                 .unwrap(),
-            ].into_iter(),
+            ]
+            .into_iter(),
             Option::Some("get_first"),
             Option::None,
         );
@@ -139,7 +140,8 @@ mod tests {
                     vec!["resource_one"]
                 )
                 .unwrap(),
-            ].into_iter(),
+            ]
+            .into_iter(),
             Option::Some("get_first"),
             Option::None,
         );
@@ -176,7 +178,8 @@ mod tests {
                     vec!["resource_one"]
                 )
                 .unwrap(),
-            ].into_iter(),
+            ]
+            .into_iter(),
             Option::Some(String::from("get_first")),
             Option::Some(String::from("resource_onw")),
         );

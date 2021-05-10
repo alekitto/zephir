@@ -1,10 +1,10 @@
 use actix_web::{HttpResponse, ResponseError};
 use derive_more::{Display, From};
-use sqlx::error::Error as DatabaseError;
+use libzephir::err::Error as LibError;
 use libzephir::policy::allowed_result::AllowedResult;
 use libzephir::policy::policy::ToJson;
-use libzephir::err::Error as LibError;
 use serde_json::{Map, Value};
+use sqlx::error::Error as DatabaseError;
 use validator::ValidationErrors;
 
 #[derive(Display, From, Debug)]
@@ -27,7 +27,7 @@ impl ResponseError for ZephirError {
                 map.insert("message".to_string(), Value::from("Not found"));
 
                 HttpResponse::NotFound().json(map)
-            },
+            }
             ZephirError::PoolError(ref err) => {
                 HttpResponse::InternalServerError().body(err.to_string())
             }
@@ -44,7 +44,10 @@ impl ResponseError for ZephirError {
             ZephirError::ValidationError(ref err) => {
                 let mut map = Map::new();
                 map.insert("status_code".to_string(), Value::from(400));
-                map.insert("errors".to_string(), serde_json::to_value(err.field_errors()).unwrap());
+                map.insert(
+                    "errors".to_string(),
+                    serde_json::to_value(err.field_errors()).unwrap(),
+                );
 
                 HttpResponse::BadRequest().json(map)
             }

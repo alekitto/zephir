@@ -122,12 +122,13 @@ impl Role for Identity {
     fn allowed<T, S>(&self, action: Option<T>, resource: Option<S>) -> AllowedResult
     where
         T: ToString + Display,
-        S: ToString + Display + Debug {
+        S: ToString + Display + Debug,
+    {
         allowed(SubjectIterator::new(self), action, resource)
     }
 }
 
-impl Eq for Identity { }
+impl Eq for Identity {}
 impl PartialEq for Identity {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id

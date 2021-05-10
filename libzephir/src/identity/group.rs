@@ -1,14 +1,14 @@
 use crate::identity::identity::{Identity, ToIdentityId};
-use crate::identity::role::{Role, allowed};
+use crate::identity::role::{allowed, Role};
 use crate::identity::subject::{Subject, SubjectIterator};
+use crate::policy::allowed_result::AllowedResult;
 use crate::policy::policy::{CompletePolicy, ToJson};
 use crate::policy::policy_set::{PolicySet, PolicySetHelper, PolicySetTrait};
 use serde_json::{Map, Value};
-use crate::policy::allowed_result::AllowedResult;
-use std::fmt::{Display, Debug};
-use std::collections::HashSet;
 use std::borrow::BorrowMut;
 use std::collections::hash_set::Iter;
+use std::collections::HashSet;
+use std::fmt::{Debug, Display};
 
 pub struct IdentitySet {
     identities: HashSet<Identity>,
@@ -91,7 +91,7 @@ impl<'a> IntoIterator for &'a IdentitySet {
 
     fn into_iter(self) -> Self::IntoIter {
         let set = &self.identities;
-        set.into_iter()
+        set.iter()
     }
 }
 
@@ -242,9 +242,10 @@ impl Role for Group {
     }
 
     fn allowed<T, S>(&self, action: Option<T>, resource: Option<S>) -> AllowedResult
-        where
-            T: ToString + Display,
-            S: ToString + Display + Debug {
+    where
+        T: ToString + Display,
+        S: ToString + Display + Debug,
+    {
         allowed(SubjectIterator::new(self), action, resource)
     }
 }

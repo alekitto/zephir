@@ -65,13 +65,12 @@ impl Compiler {
     /// # Returns
     ///
     /// A CompiledPolicy object
-    pub fn compile(
-        &self,
-        id: &str,
-        actions: &[String],
-        resources: &[String],
-    ) -> CompiledPolicy {
-        let item = if id.is_empty() { Err(CacheError::Other("".to_string())) } else { self.cache.get(id) };
+    pub fn compile(&self, id: &str, actions: &[String], resources: &[String]) -> CompiledPolicy {
+        let item = if id.is_empty() {
+            Err(CacheError::Other("".to_string()))
+        } else {
+            self.cache.get(id)
+        };
         if (&item).is_ok() && (&item).as_ref().unwrap().is_some() {
             debug!("Compiled policy {} found in cache.", id);
             return item.unwrap().unwrap();

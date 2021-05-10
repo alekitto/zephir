@@ -44,7 +44,7 @@ impl<'a, T: Subject> Iterator for SubjectIterator<'a, T> {
                 self.current += 1;
                 self.next()
             }),
-            _ => self.linked_policies.get(self.current.unsigned_abs())
+            _ => self.linked_policies.get(self.current.unsigned_abs()),
         };
 
         self.current += 1;

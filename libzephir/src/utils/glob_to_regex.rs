@@ -1,4 +1,4 @@
-use pcre2::bytes::{RegexBuilder, Regex};
+use pcre2::bytes::{Regex, RegexBuilder};
 
 pub fn from_str(glob: &str) -> Regex {
     from_string(glob.to_string())

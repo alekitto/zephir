@@ -91,7 +91,10 @@ impl ToJson for AllowedResult {
             }),
         );
 
-        result.insert(String::from("partials"), Value::from(self.partials.as_slice()));
+        result.insert(
+            String::from("partials"),
+            Value::from(self.partials.as_slice()),
+        );
 
         result
     }
@@ -152,7 +155,10 @@ mod tests {
 
         let mut json = Map::new();
         json.insert(String::from("outcome"), Value::from("ABSTAIN"));
-        json.insert(String::from("partials"), Value::from(ar.partials.as_slice()));
+        json.insert(
+            String::from("partials"),
+            Value::from(ar.partials.as_slice()),
+        );
 
         assert_eq!(ar.outcome(), AllowedOutcome::Abstain);
         assert_eq!(ar.to_json(), json);
