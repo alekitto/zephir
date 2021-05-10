@@ -97,6 +97,7 @@ pub(crate) async fn get_group_identities(
         Option::Some(group) => Ok(HttpResponse::Ok().json(
             group
                 .get_identities()
+                .await
                 .into_iter()
                 .map(|i| i.get_id())
                 .collect::<Vec<&String>>(),

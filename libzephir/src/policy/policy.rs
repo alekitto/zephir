@@ -5,6 +5,7 @@ use crate::policy::match_result::MatchResult;
 use crate::policy::{PolicyEffect, PolicyVersion};
 use serde_json::{Map, Value};
 use std::fmt::Debug;
+use std::hash::{Hash, Hasher};
 
 pub trait ToJson {
     /// Return a JSON value representing the policy
@@ -23,7 +24,7 @@ pub trait ToJson {
 
 /// Policy trait.
 /// This is the main common interface for all the policy implementations
-pub trait Policy: ToJson {
+pub trait Policy: ToJson + Eq + Hash {
     fn id(&self) -> &String {
         unimplemented!()
     }
@@ -126,6 +127,19 @@ impl Policy for PartialPolicy {
     }
 }
 
+impl Eq for PartialPolicy {}
+impl PartialEq for PartialPolicy {
+    fn eq(&self, _: &Self) -> bool {
+        false
+    }
+}
+
+impl Hash for PartialPolicy {
+    fn hash<H: Hasher>(&self, _: &mut H) {
+        unimplemented!()
+    }
+}
+
 /// Represents a complete policy which can be matched completely
 #[derive(Clone, Debug)]
 pub struct CompletePolicy {
@@ -186,6 +200,19 @@ impl Policy for CompletePolicy {
 
     fn default() -> CompletePolicy {
         unimplemented!()
+    }
+}
+
+impl Eq for CompletePolicy {}
+impl PartialEq for CompletePolicy {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Hash for CompletePolicy {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state)
     }
 }
 

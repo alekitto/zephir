@@ -1,6 +1,7 @@
 use crate::policy::policy::{CompletePolicy, Policy};
-use std::cmp::Ordering;
-use std::slice::Iter;
+use std::borrow::BorrowMut;
+use std::collections::hash_set::Iter;
+use std::collections::HashSet;
 
 pub(crate) struct PolicySetHelper {}
 
@@ -22,7 +23,7 @@ impl PolicySetHelper {
 
 #[derive(Debug)]
 pub struct PolicySet<T: Policy> {
-    policies: Vec<T>,
+    policies: HashSet<T>,
 }
 
 impl<T: Policy> Default for PolicySet<T> {
@@ -33,7 +34,9 @@ impl<T: Policy> Default for PolicySet<T> {
 
 impl<T: Policy> PolicySet<T> {
     pub fn new() -> Self {
-        PolicySet { policies: vec![] }
+        PolicySet {
+            policies: HashSet::new(),
+        }
     }
 
     pub fn len(&self) -> usize {
@@ -44,13 +47,12 @@ impl<T: Policy> PolicySet<T> {
         self.policies.is_empty()
     }
 
-    fn insert_if_missing(policies: &mut Vec<T>, policy: T) {
-        match policies
-            .iter_mut()
-            .find(|ref p| p.id().cmp(policy.id()) == Ordering::Equal)
-        {
+    fn insert_if_missing(policies: &mut HashSet<T>, policy: T) {
+        match policies.iter().find(|p| *p.id() == *policy.id()) {
             Some(_) => {}
-            None => policies.push(policy),
+            None => {
+                policies.insert(policy);
+            }
         }
     }
 }
@@ -73,15 +75,15 @@ pub trait PolicySetTrait<T: Policy> {
 
 impl<T: Policy> PolicySetTrait<T> for PolicySet<T> {
     fn add_policy(mut self, policy: T) -> Self {
-        Self::insert_if_missing(self.policies.as_mut(), policy);
+        Self::insert_if_missing(self.policies.borrow_mut(), policy);
         self
     }
 
     fn remove_policy<S: ToString>(mut self, id: S) -> Self {
+        let policy_id = id.to_string();
         self.policies = self
             .policies
-            .into_iter()
-            .filter(|p| p.id().cmp(&id.to_string()) != Ordering::Equal)
+            .drain_filter(|p| policy_id != *p.id())
             .collect();
 
         self
@@ -93,7 +95,8 @@ impl<'a, T: Policy> IntoIterator for &'a PolicySet<T> {
     type IntoIter = Iter<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.policies.iter()
+        let policy_set = &self.policies;
+        policy_set.iter()
     }
 }
 
@@ -164,10 +167,12 @@ mod tests {
         ps = ps.remove_policy("p2");
 
         let ps_ref = &ps;
-        let policies: Vec<&str> = ps_ref
+        let mut policies: Vec<&str> = ps_ref
             .into_iter()
             .map(|p: &CompletePolicy| p.id.as_str())
             .collect();
+
+        policies.sort();
 
         assert_eq!(policies.len(), 2);
         assert_eq!(policies, vec!["p1", "p3"]);

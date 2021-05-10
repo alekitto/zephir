@@ -62,7 +62,7 @@ impl IdentitySet {
         let identity_id = identity.to_identity_id();
         self.identities = self
             .identities
-            .drain_filter(|i| i.id == *identity_id)
+            .drain_filter(|i| i.id != *identity_id)
             .collect();
 
         self
@@ -158,8 +158,9 @@ impl Group {
     /// Creates an iterator upon the identities set.
     /// The iterator will not consume the set and yields elements
     /// of type is &'a Identity, where 'a is the lifetime of this group.
-    pub fn get_identities(&self) -> Iter<Identity> {
-        self.identities.identities.iter()
+    pub async fn get_identities(&self) -> Iter<'_, Identity> {
+        let identity_set = &self.identities;
+        identity_set.into_iter()
     }
 
     /// Adds an identity to the Group.
