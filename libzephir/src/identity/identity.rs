@@ -5,6 +5,7 @@ use crate::policy::policy::{CompletePolicy, ToJson};
 use crate::policy::policy_set::{PolicySet, PolicySetHelper, PolicySetTrait};
 use serde_json::{Map, Value};
 use std::fmt::{Debug, Display};
+use std::hash::{Hash, Hasher};
 
 #[derive(Debug)]
 pub struct Identity {
@@ -123,6 +124,19 @@ impl Role for Identity {
         T: ToString + Display,
         S: ToString + Display + Debug {
         allowed(SubjectIterator::new(self), action, resource)
+    }
+}
+
+impl Eq for Identity { }
+impl PartialEq for Identity {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Hash for Identity {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state)
     }
 }
 

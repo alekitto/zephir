@@ -83,7 +83,7 @@ pub(crate) async fn get_group_identities(web::Path(id): web::Path<String>, stora
         Option::Some(group) => {
             Ok(HttpResponse::Ok().json(
                 group.get_identities()
-                    .iter()
+                    .into_iter()
                     .map(|i| i.get_id())
                     .collect::<Vec<&String>>()
             ))

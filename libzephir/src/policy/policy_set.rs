@@ -55,8 +55,19 @@ impl<T: Policy> PolicySet<T> {
     }
 }
 
+/// Represents a PolicySet implementation.
+/// The set does not guarantee to retain the insertion order.
 pub trait PolicySetTrait<T: Policy> {
+    /// Adds a policy to the set.
+    ///
+    /// # Returns
+    /// The current object, to allow fluid interface.
     fn add_policy(self, policy: T) -> Self;
+
+    /// Removes a policy from the set, identified by id.
+    ///
+    /// # Returns
+    /// The current object, to allow fluid interface.
     fn remove_policy<S: ToString>(self, id: S) -> Self;
 }
 
