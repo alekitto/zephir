@@ -10,6 +10,15 @@ use std::collections::hash_set::Iter;
 use std::collections::HashSet;
 use std::fmt::{Debug, Display};
 
+/// Helper function to insert an identity to the set
+/// if no identity with the same id is found.
+fn insert_if_missing(identities: &mut HashSet<Identity>, identity: Identity) {
+    let found = identities.iter().find(|i| i.id == identity.id);
+    if found.is_none() {
+        identities.insert(identity);
+    }
+}
+
 pub struct IdentitySet {
     identities: HashSet<Identity>,
 }
@@ -47,7 +56,7 @@ impl IdentitySet {
     /// This function moves the self object returning it after the
     /// operation is completed.
     pub fn insert(mut self, identity: Identity) -> Self {
-        Self::insert_if_missing(self.identities.borrow_mut(), identity);
+        insert_if_missing(self.identities.borrow_mut(), identity);
 
         self
     }
@@ -66,15 +75,6 @@ impl IdentitySet {
             .collect();
 
         self
-    }
-
-    /// Helper function to insert an identity to the set
-    /// if no identity with the same id is found.
-    fn insert_if_missing(identities: &mut HashSet<Identity>, identity: Identity) {
-        let found = identities.iter().find(|i| i.id == identity.id);
-        if found.is_none() {
-            identities.insert(identity);
-        }
     }
 }
 

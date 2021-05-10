@@ -55,7 +55,7 @@ pub(crate) async fn allowed_action(
                 }
             );
 
-            let groups = storage.find_groups_for_identity(&identity).await?;
+            let groups = storage.find_groups_for_identity(&identity, false).await?;
             for g in groups {
                 result.merge(g.allowed(action, resource));
             }

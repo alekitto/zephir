@@ -10,7 +10,11 @@ use crate::storage::StorageManager;
 use std::convert::TryFrom;
 
 impl StorageManager {
-    pub async fn find_groups_for_identity(&self, target: &Identity) -> Result<Vec<Group>, Error> {
+    pub async fn find_groups_for_identity(
+        &self,
+        target: &Identity,
+        load_identities: bool,
+    ) -> Result<Vec<Group>, Error> {
         let groups = sqlx::query_as::<_, DbIdentity>(r#"
             SELECT id, policy_id
             FROM "group"
@@ -22,7 +26,7 @@ impl StorageManager {
 
         let mut result = vec![];
         for g in groups {
-            result.push(self._load_group(&g).await?);
+            result.push(self._load_group(&g, load_identities).await?);
         }
 
         Ok(result)
@@ -47,10 +51,10 @@ impl StorageManager {
             return Ok(Option::None);
         }
 
-        Ok(Some(self._load_group(group.as_ref().unwrap()).await?))
+        Ok(Some(self._load_group(group.as_ref().unwrap(), true).await?))
     }
 
-    async fn _load_group(&self, group: &DbIdentity) -> Result<Group, Error> {
+    async fn _load_group(&self, group: &DbIdentity, load_identities: bool) -> Result<Group, Error> {
         let inline_policy = if group.policy_id.is_some() {
             self.find_policy(group.policy_id.as_ref().unwrap()).await?
         } else {
@@ -71,6 +75,10 @@ impl StorageManager {
 
         for db_policy in policies {
             group = group.add_policy(CompletePolicy::try_from(db_policy)?);
+        }
+
+        if !load_identities {
+            return Ok(group);
         }
 
         let identities: Vec<DbIdentity> = sqlx::query_as::<_, DbIdentity>(
