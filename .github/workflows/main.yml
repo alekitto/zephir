@@ -22,15 +22,15 @@ jobs:
                   override: true
 
             - name: Cache
-              uses: actions/cache@v1
+              uses: actions/cache@v2
               with:
                   path: |
                       ~/.cargo/registry
                       ~/.cargo/git
                       target
-                  key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock') }}
+                  key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.toml', 'Cargo.lock') }}
                   restore-keys: |
-                      ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml', '**/Cargo.lock') }}
+                      ${{ runner.os }}-cargo-
 
             - uses: actions-rs/cargo@v1
               with:
