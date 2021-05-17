@@ -5,10 +5,21 @@ use crate::policy::PolicyEffect;
 use serde_json::Value;
 use std::fmt::{Debug, Display};
 
+pub struct AllowedRequest<'a, T, S>
+where
+    T: ToString + Display,
+    S: ToString + Display + Debug,
+{
+    pub(crate) action: Option<&'a T>,
+    pub(crate) resource: Option<&'a S>,
+    pub(crate) params: &'a Value,
+}
+
 pub(super) fn allowed<'a, T, S, I>(
     policies: I,
     action: Option<T>,
     resource: Option<S>,
+    params: &'a Value,
 ) -> AllowedResult
 where
     T: ToString + Display,
@@ -18,8 +29,14 @@ where
     let mut outcome: AllowedOutcome = AllowedOutcome::Abstain;
     let mut partials = vec![];
 
+    let request = AllowedRequest {
+        action: action.as_ref(),
+        resource: resource.as_ref(),
+        params,
+    };
+
     for p in policies {
-        let result = p.matching(action.as_ref(), resource.as_ref());
+        let result = p.matching(&request);
         if !result.is_match() {
             continue;
         }
@@ -42,7 +59,7 @@ where
 pub trait Role: Into<Value> {
     fn linked_policies(&self) -> &PolicySet<CompletePolicy>;
 
-    fn allowed<T, S>(&self, action: Option<T>, resource: Option<S>) -> AllowedResult
+    fn allowed<T, S>(&self, action: Option<T>, resource: Option<S>, params: &Value) -> AllowedResult
     where
         T: ToString + Display,
         S: ToString + Display + Debug,
@@ -53,7 +70,7 @@ pub trait Role: Into<Value> {
             policies.push(policy);
         }
 
-        allowed(policies.into_iter(), action, resource)
+        allowed(policies.into_iter(), action, resource, params)
     }
 
     fn into(self) -> Value {
@@ -89,7 +106,12 @@ mod tests {
 
     #[test]
     fn allowed_should_return_denied_on_no_policy() {
-        let res = allowed::<String, String, _>(vec![].into_iter(), Option::None, Option::None);
+        let res = allowed::<String, String, _>(
+            vec![].into_iter(),
+            Option::None,
+            Option::None,
+            &Value::Null,
+        );
         assert_eq!(res.outcome(), AllowedOutcome::Denied);
     }
 
@@ -115,6 +137,7 @@ mod tests {
             .into_iter(),
             Option::Some("get_first"),
             Option::None,
+            &Value::Null,
         );
 
         assert_eq!(res.outcome(), AllowedOutcome::Allowed);
@@ -144,6 +167,7 @@ mod tests {
             .into_iter(),
             Option::Some("get_first"),
             Option::None,
+            &Value::Null,
         );
 
         assert_eq!(res.outcome(), AllowedOutcome::Abstain);
@@ -182,6 +206,7 @@ mod tests {
             .into_iter(),
             Option::Some(String::from("get_first")),
             Option::Some(String::from("resource_onw")),
+            &Value::Null,
         );
 
         assert_eq!(res.outcome(), AllowedOutcome::Denied);
@@ -233,6 +258,7 @@ mod tests {
         let result = role.allowed(
             Option::Some("TestAction"),
             Option::Some("urn:resource:test-class-allow:test-id"),
+            &Value::Null,
         );
         assert_eq!(result.outcome(), AllowedOutcome::Allowed);
         assert_eq!(result.get_partials().len(), 0);
@@ -240,6 +266,7 @@ mod tests {
         let result = role.allowed(
             Option::Some("TestAction"),
             Option::Some("urn:resource:test-class-deny:test-id"),
+            &Value::Null,
         );
         assert_eq!(result.outcome(), AllowedOutcome::Denied);
         assert_eq!(result.get_partials().len(), 0);
@@ -247,15 +274,18 @@ mod tests {
         let result = role.allowed(
             Option::Some("FooAction"),
             Option::Some("urn:resource:test-class-deny:test-id"),
+            &Value::Null,
         );
         assert_eq!(result.outcome(), AllowedOutcome::Denied);
         assert_eq!(result.get_partials().len(), 0);
 
-        let result = role.allowed::<&str, String>(Option::Some("FooAction"), Option::None);
+        let result =
+            role.allowed::<&str, String>(Option::Some("FooAction"), Option::None, &Value::Null);
         assert_eq!(result.outcome(), AllowedOutcome::Abstain);
         assert_eq!(result.get_partials().len(), 1);
 
-        let result = role.allowed::<&str, String>(Option::Some("TestAction"), Option::None);
+        let result =
+            role.allowed::<&str, String>(Option::Some("TestAction"), Option::None, &Value::Null);
         assert_eq!(result.outcome(), AllowedOutcome::Allowed);
         assert_eq!(result.get_partials().len(), 1);
     }

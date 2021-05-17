@@ -119,12 +119,12 @@ impl Role for Identity {
         &self.linked_policies
     }
 
-    fn allowed<T, S>(&self, action: Option<T>, resource: Option<S>) -> AllowedResult
+    fn allowed<T, S>(&self, action: Option<T>, resource: Option<S>, params: &Value) -> AllowedResult
     where
         T: ToString + Display,
         S: ToString + Display + Debug,
     {
-        allowed(SubjectIterator::new(self), action, resource)
+        allowed(SubjectIterator::new(self), action, resource, params)
     }
 }
 
@@ -149,6 +149,7 @@ mod tests {
     use crate::policy::policy_set::PolicySetTrait;
     use crate::policy::{PolicyEffect, PolicyVersion};
     use crate::zephir_policy;
+    use serde_json::Value;
 
     #[test]
     fn can_be_created() {
@@ -189,11 +190,13 @@ mod tests {
         let result = i.allowed(
             Option::Some("test:identity"),
             Option::Some("urn:test-resource:id"),
+            &Value::Null,
         );
         assert_eq!(result.outcome(), AllowedOutcome::Allowed);
         assert_eq!(result.get_partials().len(), 0);
 
-        let result = i.allowed::<&str, String>(Option::Some("test:identity"), Option::None);
+        let result =
+            i.allowed::<&str, String>(Option::Some("test:identity"), Option::None, &Value::Null);
         assert_eq!(result.outcome(), AllowedOutcome::Abstain);
         assert_eq!(result.get_partials().len(), 1);
     }
@@ -228,6 +231,7 @@ mod tests {
         let result = i.allowed(
             Option::Some("test:identity"),
             Option::Some("urn:test:zephir:identity"),
+            &Value::Null,
         );
         assert_eq!(result.outcome(), AllowedOutcome::Allowed);
     }

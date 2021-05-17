@@ -6,6 +6,8 @@ use libzephir::policy::policy::ToJson;
 use libzephir::storage::StorageManager;
 use log::{debug, log_enabled, trace, Level};
 use serde::Deserialize;
+use serde_json::Value;
+use std::convert::TryFrom;
 
 #[derive(Deserialize)]
 pub struct AllowedInfo {
@@ -14,11 +16,49 @@ pub struct AllowedInfo {
     resource: Option<String>,
 }
 
+impl TryFrom<&Value> for AllowedInfo {
+    type Error = ZephirError;
+
+    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+        let info = value
+            .as_object()
+            .ok_or(ZephirError::InvalidRequestError)?
+            .clone();
+        let subject = info
+            .get("subject")
+            .ok_or(ZephirError::InvalidRequestError)?
+            .as_str()
+            .ok_or(ZephirError::InvalidRequestError)?
+            .to_string();
+        let action = info
+            .get("action")
+            .ok_or(ZephirError::InvalidRequestError)?
+            .as_str()
+            .ok_or(ZephirError::InvalidRequestError)?
+            .to_string();
+        let resource = match info.get("resource") {
+            None => None,
+            Some(v) => Some(
+                v.as_str()
+                    .ok_or(ZephirError::InvalidRequestError)?
+                    .to_string(),
+            ),
+        };
+
+        Ok(AllowedInfo {
+            subject,
+            action,
+            resource,
+        })
+    }
+}
+
 #[post("/allowed")]
 pub(crate) async fn allowed_action(
-    info: web::Json<AllowedInfo>,
+    body: web::Json<Value>,
     storage: web::Data<StorageManager>,
 ) -> Result<HttpResponse, ZephirError> {
+    let info = AllowedInfo::try_from(&body.0)?;
     let storage = storage.get_ref();
     let identity = storage.find_identity(&info.subject).await?.ok_or_else(|| {
         trace!(
@@ -39,7 +79,7 @@ pub(crate) async fn allowed_action(
     let action = Option::Some(&info.action);
     let resource = info.resource.as_ref();
 
-    let mut result = identity.allowed(action, resource);
+    let mut result = identity.allowed(action, resource, &body.0);
     match result.outcome() {
         AllowedOutcome::Denied => {
             trace!(r#"Identity policies denied access. Returning deny result."#);
@@ -57,7 +97,7 @@ pub(crate) async fn allowed_action(
 
             let groups = storage.find_groups_for_identity(&identity, false).await?;
             for g in groups {
-                result.merge(g.allowed(action, resource));
+                result.merge(g.allowed(action, resource, &body.0));
             }
 
             let mut builder = if result.outcome() == AllowedOutcome::Denied {

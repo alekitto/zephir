@@ -82,6 +82,7 @@ impl TryFrom<DbPolicy> for CompletePolicy {
             },
             value.actions.to_vec(),
             value.resources.to_vec(),
+            Value::Null,
         )
     }
 }

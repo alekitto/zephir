@@ -5,12 +5,17 @@ authors = ["Alessandro Chitolina <alekitto@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+lazy_static = "1.4"
 log = "0.4"
 mouscache = "0.5"
 num-traits = "0.2"
 pcre2 = "0.2"
+serde = "1.0"
 redis = "0.10"
-serde_json = "1.0"
+
+[dependencies.serde_json]
+version = "1.0"
+features = [ "arbitrary_precision", "preserve_order" ]
 
 [dependencies.sqlx]
 version = "0.5.1"

@@ -7,6 +7,7 @@ use libzephir::policy::{PolicyEffect, PolicyVersion};
 use libzephir::storage::StorageManager;
 use regex::Regex;
 use serde::Deserialize;
+use serde_json::Value;
 use std::convert::TryFrom;
 
 lazy_static! {
@@ -24,6 +25,7 @@ pub(crate) struct EmbeddedPolicyRequest {
     actions: Option<Vec<String>>,
     #[validate(length(min = 1, message = "The value is too short"))]
     resources: Option<Vec<String>>,
+    conditions: Option<Value>,
 }
 
 #[derive(Debug, Deserialize, Validate)]
@@ -41,6 +43,7 @@ pub(crate) struct UpsertPolicyRequest {
     actions: Vec<String>,
     #[validate(length(min = 1, message = "The value is too short"))]
     resources: Option<Vec<String>>,
+    conditions: Option<Value>,
 }
 
 impl TryFrom<EmbeddedPolicyRequest> for CompletePolicy {
@@ -53,6 +56,7 @@ impl TryFrom<EmbeddedPolicyRequest> for CompletePolicy {
             PolicyEffect::try_from(&value.effect.unwrap_or_else(|| "ALLOW".to_string()))?,
             value.actions.unwrap_or_default(),
             value.resources.unwrap_or_default(),
+            value.conditions.unwrap_or(Value::Null),
         )
     }
 }
@@ -67,6 +71,7 @@ impl TryFrom<UpsertPolicyRequest> for CompletePolicy {
             PolicyEffect::try_from(&value.effect)?,
             value.actions,
             value.resources.unwrap_or_else(Vec::new),
+            value.conditions.unwrap_or(Value::Null),
         )
     }
 }

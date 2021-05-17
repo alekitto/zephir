@@ -1,5 +1,6 @@
 use crate::policy::policy::{MatchablePolicy, PartialPolicy};
 use crate::policy::PolicyVersion;
+use serde_json::Value;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum ResultType {
@@ -97,11 +98,17 @@ impl MatchResult {
             return;
         }
 
-        if self.action_matches.unwrap_or(false) || self.resource_matches.unwrap_or(false) {
+        if self.action_matches.unwrap_or(false)
+            || self.resource_matches.unwrap_or(false)
+            || self.conditions_match.unwrap_or(false)
+        {
             self.outcome = ResultOutcome::Match;
         }
 
-        if self.action_matches.is_some() && self.resource_matches.is_some() {
+        if self.action_matches.is_some()
+            && self.resource_matches.is_some()
+            && self.conditions_match.is_some()
+        {
             self.result_type = ResultType::Full;
         } else {
             self.partial = PartialPolicy {
@@ -116,6 +123,11 @@ impl MatchResult {
                     None
                 } else {
                     Option::Some(policy.get_resources().to_vec())
+                },
+                conditions: if self.conditions_match.is_some() {
+                    Value::Null
+                } else {
+                    policy.get_conditions().clone()
                 },
             }
         }

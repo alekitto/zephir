@@ -242,12 +242,12 @@ impl Role for Group {
         &self.linked_policies
     }
 
-    fn allowed<T, S>(&self, action: Option<T>, resource: Option<S>) -> AllowedResult
+    fn allowed<T, S>(&self, action: Option<T>, resource: Option<S>, params: &Value) -> AllowedResult
     where
         T: ToString + Display,
         S: ToString + Display + Debug,
     {
-        allowed(SubjectIterator::new(self), action, resource)
+        allowed(SubjectIterator::new(self), action, resource, params)
     }
 }
 

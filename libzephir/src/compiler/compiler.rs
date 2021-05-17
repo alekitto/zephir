@@ -1,5 +1,6 @@
 use crate::cache::create_cache;
 use crate::compiler::compiled_policy::CompiledPolicy;
+use crate::policy::condition::Condition;
 use crate::utils::glob_to_regex;
 use log::{debug, log_enabled, trace, Level};
 use mouscache::{Cache, CacheError};
@@ -65,7 +66,13 @@ impl Compiler {
     /// # Returns
     ///
     /// A CompiledPolicy object
-    pub fn compile(&self, id: &str, actions: &[String], resources: &[String]) -> CompiledPolicy {
+    pub fn compile(
+        &self,
+        id: &str,
+        actions: &[String],
+        resources: &[String],
+        conditions: Vec<Condition>,
+    ) -> CompiledPolicy {
         let item = if id.is_empty() {
             Err(CacheError::Other("".to_string()))
         } else {
@@ -91,8 +98,7 @@ impl Compiler {
                 .collect()
         };
 
-        let cp = CompiledPolicy::new(compiled_actions, compiled_resources);
-
+        let cp = CompiledPolicy::new(compiled_actions, compiled_resources, conditions);
         let cache_insert_result = self.cache.insert(id, cp.clone());
         trace!(
             "Compiled policy {} stored in cache: {}",

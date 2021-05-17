@@ -2,6 +2,9 @@
 #![feature(try_trait)]
 #![feature(hash_drain_filter)]
 
+#[macro_use]
+extern crate lazy_static;
+
 pub mod cache;
 mod compiler;
 pub mod err;

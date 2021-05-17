@@ -1,4 +1,5 @@
 use crate::err::{Error, ErrorKind, NoneError};
+use crate::policy::condition::Condition;
 use log::{log_enabled, trace, warn, Level};
 use mouscache::{CacheError, Cacheable};
 use pcre2::bytes::{Regex, RegexBuilder};
@@ -11,7 +12,9 @@ use std::fmt::Debug;
 pub struct CompiledPolicy {
     actions: Vec<Regex>,
     resources: Vec<Regex>,
+    conditions: Vec<Condition>,
 
+    pub no_conditions: bool,
     pub all_resources: bool,
 }
 
@@ -50,7 +53,11 @@ impl CompiledPolicy {
     /// for a matching operation, while an empty actions vector means
     /// that no actions will be valid. This however should be prevented
     /// by the CompletePolicy::new that should not allow an empty actions array.
-    pub fn new(actions: Vec<Regex>, resources: Vec<Regex>) -> CompiledPolicy {
+    pub fn new(
+        actions: Vec<Regex>,
+        resources: Vec<Regex>,
+        conditions: Vec<Condition>,
+    ) -> CompiledPolicy {
         if log_enabled!(Level::Trace) {
             trace!(
                 "Compiled policy: actions: {:#?}, resources: {:#?}",
@@ -59,11 +66,14 @@ impl CompiledPolicy {
             );
         }
 
+        let no_conditions = conditions.is_empty();
         let all_resources = resources.is_empty();
 
         CompiledPolicy {
             actions,
             resources,
+            conditions,
+            no_conditions,
             all_resources,
         }
     }
@@ -163,6 +173,22 @@ impl CompiledPolicy {
         }
     }
 
+    /// Try to match request parameters to the policy conditions
+    /// This function will not support partial matching.
+    ///
+    /// # Returns
+    ///
+    /// True if all conditions matches, false otherwise
+    pub fn match_conditions(&self, params: &Value) -> bool {
+        for c in &self.conditions {
+            if !c.matching(params) {
+                return false;
+            }
+        }
+
+        true
+    }
+
     /// INTERNAL: Hydrate from redis cache object.
     ///
     /// Compiled policies can be cached in memory or on redis.
@@ -177,12 +203,16 @@ impl CompiledPolicy {
         Self: Sized,
     {
         let all_resources: bool = obj["all_res"].parse()?;
+        let no_conditions: bool = obj["no_cond"].parse()?;
         let actions = redis_obj_to_regex(&obj, "actions")?;
         let resources = redis_obj_to_regex(&obj, "resources")?;
+        let conditions: Vec<Condition> = serde_json::from_str(obj["conditions"].as_str())?;
 
         Ok(CompiledPolicy {
             actions,
             resources,
+            conditions,
+            no_conditions,
             all_resources,
         })
     }
@@ -219,6 +249,11 @@ impl Cacheable for CompiledPolicy {
             Value::from(resources).to_string(),
         ));
         v.push((String::from("all_res"), self.all_resources.to_string()));
+        v.push((
+            String::from("conditions"),
+            serde_json::to_string(&self.conditions).unwrap(),
+        ));
+
         v
     }
 

@@ -4,6 +4,7 @@ use serde_json::{Number, Value};
 use std::convert::TryFrom;
 
 pub mod allowed_result;
+pub(crate) mod condition;
 pub mod match_result;
 pub mod policy;
 pub mod policy_set;
@@ -15,12 +16,13 @@ pub fn policy_new<A, R>(
     effect: PolicyEffect,
     actions: Vec<A>,
     resources: Vec<R>,
+    conditions: Value,
 ) -> Result<CompletePolicy, Error>
 where
     A: ToString,
     R: ToString,
 {
-    CompletePolicy::new(id, version, effect, actions, resources)
+    CompletePolicy::new(id, version, effect, actions, resources, conditions)
 }
 
 #[derive(Clone, Debug, PartialEq)]
