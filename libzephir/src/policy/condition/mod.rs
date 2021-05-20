@@ -1,8 +1,14 @@
 mod flags;
+mod numeric_compare;
 mod string_equals;
 mod string_not_equals;
 
 use crate::err::{Error, ErrorKind};
+use crate::policy::condition::numeric_compare::{
+    eval_value_numeric_compare, evaluate_numeric_compare, make_numeric_equals,
+    make_numeric_greater_than, make_numeric_greater_than_or_equal, make_numeric_less_than,
+    make_numeric_less_than_or_equal, make_numeric_not_equals,
+};
 use crate::policy::condition::string_equals::{
     eval_value_str_equals, evaluate_string_equals, make_string_equals,
 };
@@ -16,9 +22,20 @@ use serde_json::{Map, Value};
 use std::fmt::Debug;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum CompareFn {
+    Eq,
+    NEq,
+    Lt,
+    Lte,
+    Gt,
+    Gte,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Condition {
     StringEquals(String, String, bool, Flags),
     StringNotEquals(String, String, bool, Flags),
+    NumericCompare(String, i64, CompareFn, Flags),
 }
 
 lazy_static! {
@@ -66,6 +83,20 @@ impl Condition {
                 }
                 "StringNotEqualsIgnoreCase" => {
                     result.append(make_string_not_equals(value, true, flags)?.as_mut())
+                }
+                "NumericEquals" => result.append(make_numeric_equals(value, flags)?.as_mut()),
+                "NumericNotEquals" => {
+                    result.append(make_numeric_not_equals(value, flags)?.as_mut())
+                }
+                "NumericLessThan" => result.append(make_numeric_less_than(value, flags)?.as_mut()),
+                "NumericLessThanEquals" => {
+                    result.append(make_numeric_less_than_or_equal(value, flags)?.as_mut())
+                }
+                "NumericGreaterThan" => {
+                    result.append(make_numeric_greater_than(value, flags)?.as_mut())
+                }
+                "NumericGreaterThanEquals" => {
+                    result.append(make_numeric_greater_than_or_equal(value, flags)?.as_mut())
                 }
 
                 _ => return Err(Error::from("Unknown condition key")),
@@ -124,6 +155,30 @@ impl Condition {
                     }
                 } else {
                     evaluate_string_not_equals(extra, key, other, case_sensitive)
+                }
+            }
+            Self::NumericCompare(key, other, operator, flags) => {
+                let flags = *flags;
+                if flags.intersects(Flags::IfExists) && extra.get(key).is_none() {
+                    return true;
+                }
+
+                if flags.intersects(Flags::ForAnyValue | Flags::ForAllValues) {
+                    if let Some(value) = extra.get(key).and_then(|v| v.as_array()) {
+                        if flags.intersects(Flags::ForAnyValue) {
+                            value
+                                .iter()
+                                .any(|v| eval_value_numeric_compare(v, other, operator))
+                        } else {
+                            value
+                                .iter()
+                                .all(|v| eval_value_numeric_compare(v, other, operator))
+                        }
+                    } else {
+                        false
+                    }
+                } else {
+                    evaluate_numeric_compare(extra, key, other, operator)
                 }
             }
         }

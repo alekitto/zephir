@@ -50,6 +50,7 @@ pub(super) fn evaluate_string_not_equals(
     value
         .get(key)
         .map(|v| eval_value_str_not_equals(v, other, case_sensitive))
+        .or(Some(false))
         .unwrap()
 }
 
@@ -66,6 +67,5 @@ pub(super) fn eval_value_str_not_equals(value: &Value, other: &str, case_sensiti
 
             cmp != Ordering::Equal
         })
-        .or(Some(false))
         .unwrap()
 }
