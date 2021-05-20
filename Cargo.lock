@@ -1498,6 +1498,7 @@ dependencies = [
 name = "libzephir"
 version = "0.1.0"
 dependencies = [
+ "bitflags",
  "lazy_static",
  "log",
  "mouscache",
