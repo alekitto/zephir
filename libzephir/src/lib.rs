@@ -1,6 +1,7 @@
 #![feature(once_cell)]
 #![feature(try_trait)]
 #![feature(hash_drain_filter)]
+#![feature(shrink_to)]
 
 #[macro_use]
 extern crate bitflags;

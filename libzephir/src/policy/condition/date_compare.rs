@@ -2,10 +2,11 @@ use crate::err::{Error, ErrorKind};
 use crate::policy::condition::flags::Flags;
 use crate::policy::condition::CompareFn;
 use crate::policy::condition::Condition;
+use chrono::{DateTime, Utc};
 use serde_json::{Map, Value};
 use std::cmp::Ordering;
 
-macro_rules! impl_make_numeric {
+macro_rules! impl_make_date {
     ($suffix: ident, $key: literal, $fn: ident) => {
         #[inline]
         pub(super) fn $suffix(value: &Value, flags: Flags) -> Result<Vec<Condition>, Error> {
@@ -16,14 +17,18 @@ macro_rules! impl_make_numeric {
                     std::format!("Conditions.{} is not an object", $key),
                 )
             })? {
-                let comp = comp.as_i64().ok_or_else(|| {
-                    Error::new(
-                        ErrorKind::UnwrapNoneValueError,
-                        std::format!("Conditions.{} value is not a string", $key),
-                    )
-                })?;
+                let comp = comp
+                    .as_str()
+                    .and_then(|s| DateTime::parse_from_rfc3339(s).ok())
+                    .map(|d| d.with_timezone(&chrono::Utc))
+                    .ok_or_else(|| {
+                        Error::new(
+                            ErrorKind::UnwrapNoneValueError,
+                            std::format!("Conditions.{} value is not a string", $key),
+                        )
+                    })?;
 
-                result.push(Condition::NumericCompare(
+                result.push(Condition::DateCompare(
                     field.clone(),
                     comp,
                     CompareFn::$fn,
@@ -36,39 +41,41 @@ macro_rules! impl_make_numeric {
     };
 }
 
-impl_make_numeric!(make_numeric_equals, "NumericEquals", Eq);
-impl_make_numeric!(make_numeric_not_equals, "NumericNotEquals", NEq);
-impl_make_numeric!(make_numeric_less_than, "NumericLessThan", Lt);
-impl_make_numeric!(
-    make_numeric_less_than_or_equal,
-    "NumericLessThanEquals",
-    Lte
-);
-impl_make_numeric!(make_numeric_greater_than, "NumericGreaterThan", Gt);
-impl_make_numeric!(
-    make_numeric_greater_than_or_equal,
-    "NumericGreaterThanEquals",
+impl_make_date!(make_date_equals, "DateEquals", Eq);
+impl_make_date!(make_date_not_equals, "DateNotEquals", NEq);
+impl_make_date!(make_date_less_than, "DateLessThan", Lt);
+impl_make_date!(make_date_less_than_or_equal, "DateLessThanEquals", Lte);
+impl_make_date!(make_date_greater_than, "DateGreaterThan", Gt);
+impl_make_date!(
+    make_date_greater_than_or_equal,
+    "DateGreaterThanEquals",
     Gte
 );
 
 #[inline]
-pub(super) fn evaluate_numeric_compare(
+pub(super) fn evaluate_date_compare(
     value: &Map<String, Value>,
     key: &String,
-    other: &i64,
+    other: &DateTime<Utc>,
     operator: &CompareFn,
 ) -> bool {
     value
         .get(key)
-        .map(|v| eval_value_numeric_compare(v, other, operator))
+        .map(|v| eval_value_date_compare(v, other, operator))
         .or(Some(false))
         .unwrap()
 }
 
 #[inline]
-pub(super) fn eval_value_numeric_compare(value: &Value, other: &i64, op: &CompareFn) -> bool {
+pub(super) fn eval_value_date_compare(
+    value: &Value,
+    other: &DateTime<Utc>,
+    op: &CompareFn,
+) -> bool {
     value
-        .as_i64()
+        .as_str()
+        .and_then(|s| DateTime::parse_from_rfc3339(s).ok())
+        .map(|d| d.with_timezone(&Utc))
         .map(|v| {
             let cmp = v.cmp(other);
             match *op {

@@ -81,7 +81,7 @@ dependencies = [
  "serde_urlencoded",
  "sha-1",
  "slab",
- "time",
+ "time 0.2.26",
 ]
 
 [[package]]
@@ -247,7 +247,7 @@ dependencies = [
  "serde_json",
  "serde_urlencoded",
  "socket2 0.3.19",
- "time",
+ "time 0.2.26",
  "tinyvec",
  "url 2.2.2",
 ]
@@ -561,6 +561,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
 
 [[package]]
+name = "bitstring"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e54f7b7a46d7b183eb41e2d82965261fa8a1597c68b50aced268ee1fc70272d"
+
+[[package]]
 name = "bitvec"
 version = "0.19.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -697,8 +703,22 @@ version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "670ad68c9088c2a963aaa298cb369688cf3f9465ce5e2d4ca10e6e0098a1ce73"
 dependencies = [
+ "libc",
  "num-integer",
  "num-traits",
+ "serde",
+ "time 0.1.43",
+ "winapi 0.3.9",
+]
+
+[[package]]
+name = "cidr"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c6316c62053228eddd526a5e6deb6344c80bf2bc1e9786e7f90b3083e73197c1"
+dependencies = [
+ "bitstring",
+ "serde",
 ]
 
 [[package]]
@@ -751,7 +771,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "03a5d7b21829bc7b4bf4754a978a241ae54ea55a40f92bb20216e54096f4b951"
 dependencies = [
  "percent-encoding 2.1.0",
- "time",
+ "time 0.2.26",
  "version_check",
 ]
 
@@ -1498,7 +1518,10 @@ dependencies = [
 name = "libzephir"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "bitflags",
+ "chrono",
+ "cidr",
  "lazy_static",
  "log",
  "mouscache",
@@ -2868,6 +2891,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d050e60b33d41c19108b32cea32164033a9013fe3b46cbd4457559bfbf77afaa"
 dependencies = [
  "num_cpus",
+]
+
+[[package]]
+name = "time"
+version = "0.1.43"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ca8a50ef2360fbd1eeb0ecd46795a87a19024eb4b53c5dc916ca1fd95fe62438"
+dependencies = [
+ "libc",
+ "winapi 0.3.9",
 ]
 
 [[package]]

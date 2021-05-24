@@ -5,7 +5,9 @@ authors = ["Alessandro Chitolina <alekitto@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+base64 = "0.13"
 bitflags = "1.2"
+cidr = "0.1"
 lazy_static = "1.4"
 log = "0.4"
 mouscache = "0.5"
@@ -13,6 +15,10 @@ num-traits = "0.2"
 pcre2 = "0.2"
 serde = "1.0"
 redis = "0.10"
+
+[dependencies.chrono]
+version = "0.4"
+features = ["serde"]
 
 [dependencies.serde_json]
 version = "1.0"
