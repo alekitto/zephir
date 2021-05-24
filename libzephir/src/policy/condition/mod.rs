@@ -22,6 +22,7 @@ use crate::policy::condition::date_compare::{
 };
 use crate::policy::condition::ip_compare::{
     eval_value_ip_address, eval_value_not_ip_address, evaluate_ip_address, evaluate_not_ip_address,
+    make_ip_address, make_not_ip_address,
 };
 use crate::policy::condition::numeric_compare::{
     eval_value_numeric_compare, evaluate_numeric_compare, make_numeric_equals,
@@ -172,6 +173,8 @@ impl Condition {
                 }
                 "Bool" => result.append(make_bool_equals(value, flags)?.as_mut()),
                 "Binary" => result.append(make_binary_equals(value, flags)?.as_mut()),
+                "IpAddress" => result.append(make_ip_address(value, flags)?.as_mut()),
+                "NotIpAddress" => result.append(make_not_ip_address(value, flags)?.as_mut()),
 
                 _ => return Err(Error::from("Unknown condition key")),
             }
