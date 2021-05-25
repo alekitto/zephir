@@ -47,6 +47,7 @@ fn get_db_connection_string() -> Result<String, Error> {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init();
+    libzephir::initialize_libzephir();
 
     let pool = PgPoolOptions::new()
         .max_connections(5)

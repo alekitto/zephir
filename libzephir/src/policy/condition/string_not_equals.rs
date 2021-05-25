@@ -43,7 +43,7 @@ pub(super) fn make_string_not_equals(
 #[inline]
 pub(super) fn evaluate_string_not_equals(
     value: &Map<String, Value>,
-    key: &String,
+    key: &str,
     other: &str,
     case_sensitive: &bool,
 ) -> bool {

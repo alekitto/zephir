@@ -55,7 +55,7 @@ impl_make_date!(
 #[inline]
 pub(super) fn evaluate_date_compare(
     value: &Map<String, Value>,
-    key: &String,
+    key: &str,
     other: &DateTime<Utc>,
     operator: &CompareFn,
 ) -> bool {

@@ -5,8 +5,11 @@ mod bool_compare;
 mod date_compare;
 mod ip_compare;
 mod numeric_compare;
+mod script;
 mod string_equals;
 mod string_not_equals;
+
+pub(crate) use script::initialize_v8_platform;
 
 use crate::err::{Error, ErrorKind};
 use crate::policy::condition::binary_compare::{
@@ -29,6 +32,7 @@ use crate::policy::condition::numeric_compare::{
     make_numeric_greater_than, make_numeric_greater_than_or_equal, make_numeric_less_than,
     make_numeric_less_than_or_equal, make_numeric_not_equals,
 };
+use crate::policy::condition::script::{evaluate_script, make_script};
 use crate::policy::condition::string_equals::{
     eval_value_str_equals, evaluate_string_equals, make_string_equals,
 };
@@ -68,6 +72,7 @@ pub enum Condition {
     BinaryEquals(String, Vec<u8>, Flags),
     IpAddress(String, AnyIpCidr, Flags),
     NotIpAddress(String, AnyIpCidr, Flags),
+    Script(String),
 }
 
 lazy_static! {
@@ -76,7 +81,7 @@ lazy_static! {
 
 fn internal_matching<E>(
     params: &Map<String, Value>,
-    key: &String,
+    key: &str,
     flags: &Flags,
     eval_value: E,
 ) -> Option<bool>
@@ -122,6 +127,11 @@ impl Condition {
         for (key, value) in map {
             let mut key = key.as_str();
             let mut flags = Flags::None;
+
+            if key == "Script" {
+                result.push(make_script(value)?);
+                continue;
+            }
 
             if key.starts_with("ForAnyValue") {
                 flags.set(Flags::ForAnyValue, true);
@@ -226,6 +236,7 @@ impl Condition {
                 internal_matching(extra, key, flags, |v| eval_value_not_ip_address(v, other))
                     .unwrap_or_else(|| evaluate_not_ip_address(extra, key, other))
             }
+            Self::Script(script) => evaluate_script(script.as_str(), params),
         }
     }
 }

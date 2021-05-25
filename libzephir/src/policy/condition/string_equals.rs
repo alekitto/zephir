@@ -43,7 +43,7 @@ pub(super) fn make_string_equals(
 #[inline]
 pub(super) fn evaluate_string_equals(
     value: &Map<String, Value>,
-    key: &String,
+    key: &str,
     other: &str,
     case_sensitive: &bool,
 ) -> bool {

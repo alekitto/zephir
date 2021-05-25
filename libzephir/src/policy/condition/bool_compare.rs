@@ -26,7 +26,7 @@ pub(super) fn make_bool_equals(value: &Value, flags: Flags) -> Result<Vec<Condit
 }
 
 #[inline]
-pub(super) fn evaluate_bool_equals(value: &Map<String, Value>, key: &String, other: &bool) -> bool {
+pub(super) fn evaluate_bool_equals(value: &Map<String, Value>, key: &str, other: &bool) -> bool {
     value
         .get(key)
         .map(|v| eval_value_bool_equals(v, other))

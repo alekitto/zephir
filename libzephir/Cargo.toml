@@ -15,6 +15,7 @@ num-traits = "0.2"
 pcre2 = "0.2"
 serde = "1.0"
 redis = "0.10"
+rusty_v8 = "0.22"
 
 [dependencies.chrono]
 version = "0.4"

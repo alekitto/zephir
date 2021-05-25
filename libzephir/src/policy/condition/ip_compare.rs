@@ -70,7 +70,7 @@ pub(super) fn make_not_ip_address(value: &Value, flags: Flags) -> Result<Vec<Con
 #[inline]
 pub(super) fn evaluate_ip_address(
     value: &Map<String, Value>,
-    key: &String,
+    key: &str,
     other: &AnyIpCidr,
 ) -> bool {
     value
@@ -82,7 +82,7 @@ pub(super) fn evaluate_ip_address(
 #[inline]
 pub(super) fn evaluate_not_ip_address(
     value: &Map<String, Value>,
-    key: &String,
+    key: &str,
     other: &AnyIpCidr,
 ) -> bool {
     value

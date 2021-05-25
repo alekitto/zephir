@@ -54,7 +54,7 @@ impl_make_numeric!(
 #[inline]
 pub(super) fn evaluate_numeric_compare(
     value: &Map<String, Value>,
-    key: &String,
+    key: &str,
     other: &i64,
     operator: &CompareFn,
 ) -> bool {
