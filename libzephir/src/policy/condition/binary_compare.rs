@@ -87,8 +87,36 @@ pub(super) fn eval_value_binary_equals(value: &Value, other: &[u8]) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use crate::policy::condition::binary_compare::{eval_value_binary_equals, evaluate_binary_equals};
+    use crate::policy::condition::binary_compare::{eval_value_binary_equals, evaluate_binary_equals, make_binary_equals};
     use serde_json::Value;
+    use crate::policy::condition::flags::Flags;
+
+    #[test]
+    fn should_build_binary_condition() {
+        let obj = serde_json::json!({
+            "FieldOne": "SGVsbG8gd29ybGQh"
+        });
+
+        let mut condition = make_binary_equals(&obj, Flags::None).unwrap();
+        assert_eq!(condition.len(), 1);
+
+        let cond = condition.pop().unwrap();
+        assert_eq!(cond.matching(&serde_json::json!({
+            "FieldOne": "SGVsbG8gd29ybGQh",
+            "FieldTwo": "SGVsbG8gd29ybGQ=",
+        })), true);
+    }
+
+    #[test]
+    fn should_raise_err_if_malformed_object() {
+        let obj = serde_json::json!("SGVsbG8gd29ybGQh");
+        make_binary_equals(&obj, Flags::None).expect_err("Should raise error");
+
+        let obj = serde_json::json!({
+            "FieldOne": [ "SGVsbG8gd29ybGQh" ]
+        });
+        make_binary_equals(&obj, Flags::None).expect_err("Should raise error");
+    }
 
     #[test]
     fn should_correctly_evaluate_binary_comparison() {
@@ -98,6 +126,9 @@ mod tests {
         let bytes_two: [u8; 11] = [ 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100 ];
         assert_eq!(eval_value_binary_equals(&Value::from("SGVsbG8gd29ybGQh"), &bytes_two), false);
 
+        let bytes_three: [u8; 12] = [ 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 32 ];
+        assert_eq!(eval_value_binary_equals(&Value::from("SGVsbG8gd29ybGQh"), &bytes_two), false);
+
         let map = serde_json::json!({
             "FieldOne": "SGVsbG8gd29ybGQh",
             "FieldTwo": "SGVsbG8gd29ybGQ=",
@@ -105,9 +136,11 @@ mod tests {
 
         assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldOne", &bytes_one), true);
         assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldOne", &bytes_two), false);
+        assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldOne", &bytes_three), false);
 
         assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldTwo", &bytes_one), false);
         assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldTwo", &bytes_two), true);
+        assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldTwo", &bytes_three), false);
     }
 
     #[test]
