@@ -66,11 +66,7 @@ where
                     v8::Array::new(&mut self.context_scope, i32::try_from(vec.len()).unwrap());
                 for (i, value) in vec.iter().enumerate() {
                     let value = self.value_to_v8_object(value);
-                    arr.set_index(
-                        &mut self.context_scope,
-                        u32::try_from(i).unwrap(),
-                        value,
-                    );
+                    arr.set_index(&mut self.context_scope, u32::try_from(i).unwrap(), value);
                 }
 
                 arr.into()

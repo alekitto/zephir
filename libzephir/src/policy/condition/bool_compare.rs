@@ -36,17 +36,16 @@ pub(super) fn evaluate_bool_equals(value: &Map<String, Value>, key: &str, other:
 
 #[inline]
 pub(super) fn eval_value_bool_equals(value: &Value, other: &bool) -> bool {
-    value
-        .as_bool()
-        .map(|v| v == *other)
-        .unwrap_or(false)
+    value.as_bool().map(|v| v == *other).unwrap_or(false)
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::policy::condition::bool_compare::{eval_value_bool_equals, evaluate_bool_equals, make_bool_equals};
-    use serde_json::Value;
+    use crate::policy::condition::bool_compare::{
+        eval_value_bool_equals, evaluate_bool_equals, make_bool_equals,
+    };
     use crate::policy::condition::flags::Flags;
+    use serde_json::Value;
 
     #[test]
     fn should_build_boolean_condition() {
@@ -58,10 +57,13 @@ mod tests {
         assert_eq!(condition.len(), 1);
 
         let cond = condition.pop().unwrap();
-        assert_eq!(cond.matching(&serde_json::json!({
-            "FieldOne": true,
-            "FieldTwo": false,
-        })), true);
+        assert_eq!(
+            cond.matching(&serde_json::json!({
+                "FieldOne": true,
+                "FieldTwo": false,
+            })),
+            true
+        );
     }
 
     #[test]
@@ -89,6 +91,9 @@ mod tests {
             "FieldOne": [ "AnArray" ],
         });
 
-        assert_eq!(evaluate_bool_equals(map.as_object().unwrap(), "FieldOne", &true), false);
+        assert_eq!(
+            evaluate_bool_equals(map.as_object().unwrap(), "FieldOne", &true),
+            false
+        );
     }
 }

@@ -49,11 +49,7 @@ pub(super) fn make_binary_equals(value: &Value, flags: Flags) -> Result<Vec<Cond
 }
 
 #[inline]
-pub(super) fn evaluate_binary_equals(
-    value: &Map<String, Value>,
-    key: &str,
-    other: &[u8],
-) -> bool {
+pub(super) fn evaluate_binary_equals(value: &Map<String, Value>, key: &str, other: &[u8]) -> bool {
     value
         .get(key)
         .map(|v| eval_value_binary_equals(v, other))
@@ -87,9 +83,11 @@ pub(super) fn eval_value_binary_equals(value: &Value, other: &[u8]) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use crate::policy::condition::binary_compare::{eval_value_binary_equals, evaluate_binary_equals, make_binary_equals};
-    use serde_json::Value;
+    use crate::policy::condition::binary_compare::{
+        eval_value_binary_equals, evaluate_binary_equals, make_binary_equals,
+    };
     use crate::policy::condition::flags::Flags;
+    use serde_json::Value;
 
     #[test]
     fn should_build_binary_condition() {
@@ -101,10 +99,13 @@ mod tests {
         assert_eq!(condition.len(), 1);
 
         let cond = condition.pop().unwrap();
-        assert_eq!(cond.matching(&serde_json::json!({
-            "FieldOne": "SGVsbG8gd29ybGQh",
-            "FieldTwo": "SGVsbG8gd29ybGQ=",
-        })), true);
+        assert_eq!(
+            cond.matching(&serde_json::json!({
+                "FieldOne": "SGVsbG8gd29ybGQh",
+                "FieldTwo": "SGVsbG8gd29ybGQ=",
+            })),
+            true
+        );
     }
 
     #[test]
@@ -120,36 +121,66 @@ mod tests {
 
     #[test]
     fn should_correctly_evaluate_binary_comparison() {
-        let bytes_one: [u8; 12] = [ 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33 ];
-        assert_eq!(eval_value_binary_equals(&Value::from("SGVsbG8gd29ybGQh"), &bytes_one), true);
+        let bytes_one: [u8; 12] = [72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33];
+        assert_eq!(
+            eval_value_binary_equals(&Value::from("SGVsbG8gd29ybGQh"), &bytes_one),
+            true
+        );
 
-        let bytes_two: [u8; 11] = [ 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100 ];
-        assert_eq!(eval_value_binary_equals(&Value::from("SGVsbG8gd29ybGQh"), &bytes_two), false);
+        let bytes_two: [u8; 11] = [72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100];
+        assert_eq!(
+            eval_value_binary_equals(&Value::from("SGVsbG8gd29ybGQh"), &bytes_two),
+            false
+        );
 
-        let bytes_three: [u8; 12] = [ 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 32 ];
-        assert_eq!(eval_value_binary_equals(&Value::from("SGVsbG8gd29ybGQh"), &bytes_two), false);
+        let bytes_three: [u8; 12] = [72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 32];
+        assert_eq!(
+            eval_value_binary_equals(&Value::from("SGVsbG8gd29ybGQh"), &bytes_two),
+            false
+        );
 
         let map = serde_json::json!({
             "FieldOne": "SGVsbG8gd29ybGQh",
             "FieldTwo": "SGVsbG8gd29ybGQ=",
         });
 
-        assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldOne", &bytes_one), true);
-        assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldOne", &bytes_two), false);
-        assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldOne", &bytes_three), false);
+        assert_eq!(
+            evaluate_binary_equals(map.as_object().unwrap(), "FieldOne", &bytes_one),
+            true
+        );
+        assert_eq!(
+            evaluate_binary_equals(map.as_object().unwrap(), "FieldOne", &bytes_two),
+            false
+        );
+        assert_eq!(
+            evaluate_binary_equals(map.as_object().unwrap(), "FieldOne", &bytes_three),
+            false
+        );
 
-        assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldTwo", &bytes_one), false);
-        assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldTwo", &bytes_two), true);
-        assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldTwo", &bytes_three), false);
+        assert_eq!(
+            evaluate_binary_equals(map.as_object().unwrap(), "FieldTwo", &bytes_one),
+            false
+        );
+        assert_eq!(
+            evaluate_binary_equals(map.as_object().unwrap(), "FieldTwo", &bytes_two),
+            true
+        );
+        assert_eq!(
+            evaluate_binary_equals(map.as_object().unwrap(), "FieldTwo", &bytes_three),
+            false
+        );
     }
 
     #[test]
     fn should_return_false_if_value_is_not_a_string() {
-        let bytes: [u8; 12] = [ 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33 ];
+        let bytes: [u8; 12] = [72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33];
         let map = serde_json::json!({
             "FieldOne": [ "AnArray" ],
         });
 
-        assert_eq!(evaluate_binary_equals(map.as_object().unwrap(), "FieldOne", &bytes), false);
+        assert_eq!(
+            evaluate_binary_equals(map.as_object().unwrap(), "FieldOne", &bytes),
+            false
+        );
     }
 }
