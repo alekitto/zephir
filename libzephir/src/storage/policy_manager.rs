@@ -50,9 +50,9 @@ impl StorageManager {
         sqlx::query(
             r#"
             INSERT INTO policy(id, version, effect, actions, resources)
-            VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
+            VALUES ($1, $2, $3, $4, $5)
             ON CONFLICT (id)
-            DO UPDATE SET version = $2, effect = $3, actions = $4::jsonb, resources = $5::jsonb
+            DO UPDATE SET version = $2, effect = $3, actions = $4, resources = $5
         "#,
         )
         .bind(id)
