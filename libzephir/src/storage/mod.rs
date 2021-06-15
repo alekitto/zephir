@@ -3,15 +3,15 @@ mod identity_manager;
 mod policy_manager;
 mod types;
 
-use sqlx::{Any, Pool};
+use sqlx::{Pool, Postgres};
 
 #[derive(Clone)]
 pub struct StorageManager {
-    pool: Pool<Any>,
+    pool: Pool<Postgres>,
 }
 
 impl StorageManager {
-    pub fn new(pool: Pool<Any>) -> Self {
+    pub fn new(pool: Pool<Postgres>) -> Self {
         StorageManager { pool }
     }
 }

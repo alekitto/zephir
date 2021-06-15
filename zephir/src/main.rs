@@ -9,7 +9,7 @@ use actix_web::middleware::Logger;
 use actix_web::{App, HttpServer};
 use libzephir::err::{Error, ErrorKind};
 use libzephir::storage::StorageManager;
-use sqlx::any::AnyPoolOptions;
+use sqlx::postgres::PgPoolOptions;
 
 fn get_serve_port() -> u16 {
     let serve_port = std::env::var("SERVE_PORT");
@@ -49,7 +49,7 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
     libzephir::initialize_libzephir();
 
-    let pool = AnyPoolOptions::new()
+    let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(get_db_connection_string().unwrap().as_str())
         .await

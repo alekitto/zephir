@@ -5,7 +5,7 @@ use crate::policy::{PolicyEffect, PolicyVersion};
 use crate::storage::types::DbPolicy;
 use crate::storage::StorageManager;
 use serde_json::Value;
-use sqlx::{Any, Transaction};
+use sqlx::{Postgres, Transaction};
 use std::convert::TryFrom;
 
 impl StorageManager {
@@ -41,7 +41,7 @@ impl StorageManager {
     pub(super) async fn _save_policy(
         &self,
         p: &CompletePolicy,
-        transaction: &mut Transaction<'_, Any>,
+        transaction: &mut Transaction<'_, Postgres>,
     ) -> Result<(), Error> {
         let id = p.id.as_str();
         let version: i32 = (&p.version).into();
@@ -58,8 +58,8 @@ impl StorageManager {
         .bind(id)
         .bind(version)
         .bind(effect)
-        .bind(serde_json::to_string(p.get_actions())?)
-        .bind(serde_json::to_string(p.get_resources())?)
+        .bind(Value::from(p.get_actions()))
+        .bind(Value::from(p.get_resources()))
         .execute(transaction)
         .await?;
 
@@ -80,8 +80,8 @@ impl TryFrom<DbPolicy> for CompletePolicy {
             } else {
                 PolicyEffect::Deny
             },
-            serde_json::from_str::<Vec<String>>(&value.actions)?,
-            serde_json::from_str::<Vec<String>>(&value.resources)?,
+            value.actions.to_vec(),
+            value.resources.to_vec(),
             Value::Null,
         )
     }
