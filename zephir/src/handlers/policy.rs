@@ -66,7 +66,7 @@ impl TryFrom<UpsertPolicyRequest> for CompletePolicy {
 
     fn try_from(value: UpsertPolicyRequest) -> Result<Self, Self::Error> {
         CompletePolicy::new(
-            "".to_string(),
+            value.id,
             PolicyVersion::try_from(value.version)?,
             PolicyEffect::try_from(&value.effect)?,
             value.actions,
