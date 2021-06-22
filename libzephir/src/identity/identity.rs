@@ -235,4 +235,97 @@ mod tests {
         );
         assert_eq!(result.outcome(), AllowedOutcome::Allowed);
     }
+
+    #[test]
+    fn should_check_all_policies() {
+        let i = Identity::new("IdentityTestShouldCheckAllPolicies", None);
+
+        let i = i.add_policy(
+            zephir_policy!(
+                "TestLinkedPolicyAllOnIdentity",
+                PolicyVersion::Version1,
+                PolicyEffect::Allow,
+                vec!["test:identity", "test:identity-access"],
+                vec!["*"]
+            )
+            .unwrap(),
+        );
+
+        let i = i.add_policy(
+            zephir_policy!(
+                "TestLinkedPolicyAllOnIdentity2",
+                PolicyVersion::Version1,
+                PolicyEffect::Allow,
+                vec!["core:identity", "core:identity-access"],
+                vec!["*"]
+            )
+            .unwrap(),
+        );
+
+        let i = i.add_policy(
+            zephir_policy!(
+                "TestLinkedPolicyAllOnIdentity3",
+                PolicyVersion::Version1,
+                PolicyEffect::Allow,
+                vec!["core-x:identity", "core-x:identity-access"],
+                vec!["*"]
+            )
+            .unwrap(),
+        );
+
+        assert_eq!(
+            i.allowed(
+                Option::Some("test:identity"),
+                Option::Some("urn:test:zephir:identity"),
+                &Value::Null,
+            )
+            .outcome(),
+            AllowedOutcome::Allowed
+        );
+
+        let i = Identity::new("IdentityTestShouldCheckAllPolicies", None);
+
+        let i = i.add_policy(
+            zephir_policy!(
+                "TestLinkedPolicyAllOnIdentity",
+                PolicyVersion::Version1,
+                PolicyEffect::Allow,
+                vec!["test:identity", "test:identity-access"],
+                vec!["*"]
+            )
+            .unwrap(),
+        );
+
+        let i = i.add_policy(
+            zephir_policy!(
+                "TestLinkedPolicyAllOnIdentity2",
+                PolicyVersion::Version1,
+                PolicyEffect::Allow,
+                vec!["core:identity", "core:identity-access"],
+                vec!["*"]
+            )
+            .unwrap(),
+        );
+
+        let i = i.add_policy(
+            zephir_policy!(
+                "TestLinkedPolicyAllOnIdentity3",
+                PolicyVersion::Version1,
+                PolicyEffect::Allow,
+                vec!["core-x:identity", "core-x:identity-access"],
+                vec!["*"]
+            )
+            .unwrap(),
+        );
+
+        assert_eq!(
+            i.allowed(
+                Option::Some("test:identity"),
+                Option::Some("urn:test:zephir:identity"),
+                &Value::Null,
+            )
+            .outcome(),
+            AllowedOutcome::Allowed
+        );
+    }
 }

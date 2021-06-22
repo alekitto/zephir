@@ -34,7 +34,7 @@ impl<'a, T: Subject> Iterator for SubjectIterator<'a, T> {
     type Item = &'a CompletePolicy;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.current >= self.total {
+        if self.current > self.total {
             return Option::None;
         }
 

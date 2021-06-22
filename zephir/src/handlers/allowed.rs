@@ -37,12 +37,15 @@ impl TryFrom<&Value> for AllowedInfo {
             .ok_or(ZephirError::InvalidRequestError)?
             .to_string();
         let resource = match info.get("resource") {
-            None => None,
-            Some(v) => Some(
-                v.as_str()
-                    .ok_or(ZephirError::InvalidRequestError)?
-                    .to_string(),
-            ),
+            None | Some(Value::Null) => None,
+            Some(Value::String(str)) => {
+                if str.is_empty() {
+                    None
+                } else {
+                    Some(str.to_string())
+                }
+            }
+            _ => return Err(ZephirError::InvalidRequestError),
         };
 
         Ok(AllowedInfo {
