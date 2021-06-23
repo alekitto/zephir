@@ -29,6 +29,17 @@ pub(crate) struct EmbeddedPolicyRequest {
 }
 
 #[derive(Debug, Deserialize, Validate)]
+pub(crate) struct InlinePolicy {
+    #[validate(regex(path = "RE_EFFECT", message = "Invalid field."))]
+    effect: String,
+    #[validate(length(min = 1, message = "The value is too short"))]
+    actions: Vec<String>,
+    #[validate(length(min = 1, message = "The value is too short"))]
+    resources: Option<Vec<String>>,
+    conditions: Option<Value>,
+}
+
+#[derive(Debug, Deserialize, Validate)]
 pub(crate) struct UpsertPolicyRequest {
     #[validate(
         length(min = 1, message = "The value is too short"),
@@ -68,6 +79,21 @@ impl TryFrom<UpsertPolicyRequest> for CompletePolicy {
         CompletePolicy::new(
             value.id,
             PolicyVersion::try_from(value.version)?,
+            PolicyEffect::try_from(&value.effect)?,
+            value.actions,
+            value.resources.unwrap_or_else(Vec::new),
+            value.conditions.unwrap_or(Value::Null),
+        )
+    }
+}
+
+impl TryFrom<InlinePolicy> for CompletePolicy {
+    type Error = Error;
+
+    fn try_from(value: InlinePolicy) -> Result<Self, Self::Error> {
+        CompletePolicy::new(
+            "".to_string(),
+            PolicyVersion::Version1,
             PolicyEffect::try_from(&value.effect)?,
             value.actions,
             value.resources.unwrap_or_else(Vec::new),

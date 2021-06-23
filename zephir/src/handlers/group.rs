@@ -1,5 +1,5 @@
 use crate::err::ZephirError;
-use crate::handlers::policy::UpsertPolicyRequest;
+use crate::handlers::policy::InlinePolicy;
 use actix_web::{get, patch, post, web, HttpResponse};
 use actix_web_validator::Validate;
 use libzephir::identity::group::Group;
@@ -16,7 +16,7 @@ pub(crate) struct UpsertGroupRequest {
     id: String,
     linked_policies: Vec<String>,
     #[validate]
-    inline_policy: Option<UpsertPolicyRequest>,
+    inline_policy: Option<InlinePolicy>,
 }
 
 type StringType<'a> = &'a str;

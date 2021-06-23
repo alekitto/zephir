@@ -1,5 +1,5 @@
 use crate::err::ZephirError;
-use crate::handlers::policy::UpsertPolicyRequest;
+use crate::handlers::policy::InlinePolicy;
 use actix_web::{get, post, web, HttpResponse};
 use actix_web_validator::Validate;
 use libzephir::identity::identity::Identity;
@@ -15,7 +15,7 @@ pub(crate) struct UpsertIdentityRequest {
     id: String,
     linked_policies: Vec<String>,
     #[validate]
-    inline_policy: Option<UpsertPolicyRequest>,
+    inline_policy: Option<InlinePolicy>,
 }
 
 #[post("/identities")]

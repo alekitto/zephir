@@ -46,7 +46,6 @@ impl ResponseError for ZephirError {
                     "Invalid request"
                 ]
             })),
-            _ => HttpResponse::InternalServerError().finish(),
         }
     }
 }
