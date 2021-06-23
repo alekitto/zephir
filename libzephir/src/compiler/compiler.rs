@@ -2,7 +2,7 @@ use crate::cache::create_cache;
 use crate::compiler::compiled_policy::CompiledPolicy;
 use crate::policy::condition::Condition;
 use crate::utils::glob_to_regex;
-use log::{debug, log_enabled, trace, Level};
+use log::{debug, log_enabled, trace, warn, Level};
 use mouscache::{Cache, CacheError};
 use std::lazy::SyncLazy;
 use std::ops::Deref;
@@ -99,16 +99,14 @@ impl Compiler {
         };
 
         let cp = CompiledPolicy::new(compiled_actions, compiled_resources, conditions);
-        let cache_insert_result = self.cache.insert(id, cp.clone());
-        trace!(
-            "Compiled policy {} stored in cache: {}",
-            id,
-            if cache_insert_result.is_ok() {
-                "SUCCESS"
-            } else {
-                "FAIL"
-            }
-        );
+        if ! id.is_empty() {
+            self.cache.insert(id, cp.clone())
+                .map_err(|err| {
+                    warn!(r#"Compiled policy "{}" failed to be stored in cache: {}"#, id, err.to_string());
+                    err
+                })
+                .and_then(|res| { trace!(r#"Compiled policy "{}" successfully stored in cache"#, id); Ok(()) });
+        }
 
         debug!("Compiled policy with id {}", id);
         if log_enabled!(Level::Trace) {
