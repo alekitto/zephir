@@ -67,6 +67,10 @@ impl Subject for Identity {
     fn get_inline_policy(&self) -> Option<&CompletePolicy> {
         self.inline_policy.as_ref()
     }
+
+    fn get_inline_policy_mut(&mut self) -> Option<&mut CompletePolicy> {
+        self.inline_policy.as_mut()
+    }
 }
 
 impl ToJson for Identity {

@@ -99,15 +99,18 @@ impl StorageManager {
         Ok(group)
     }
 
-    pub async fn save_group(&self, g: &Group) -> Result<(), Error> {
-        let embedded_policy = g.get_inline_policy();
+    pub async fn save_group(&self, g: &mut Group) -> Result<(), Error> {
+        let group_name = g.name.clone();
+        let embedded_policy = g.get_inline_policy_mut();
 
         let mut transaction = self.pool.begin().await?;
-        if embedded_policy.is_some() {
-            self._save_policy(embedded_policy.unwrap(), &mut transaction)
-                .await?;
+        let policy_id = format!("__embedded_policy_group_{}__", group_name);
+        let mut policy_param = None;
+        if let Some(embedded_policy) = embedded_policy {
+            policy_param = Some(policy_id.clone());
+            embedded_policy.id = policy_id;
+            self._save_policy(embedded_policy, &mut transaction).await?;
         } else {
-            let policy_id = "__embedded_policy_group_".to_owned() + g.name.as_str() + "__";
             sqlx::query("DELETE FROM policy WHERE id = $1")
                 .bind(policy_id)
                 .execute(&mut transaction)
@@ -122,11 +125,7 @@ impl StorageManager {
         "#,
         )
         .bind(&g.name)
-        .bind(if embedded_policy.is_none() {
-            Option::None
-        } else {
-            Option::Some(&embedded_policy.unwrap().id)
-        })
+        .bind(policy_param)
         .execute(&mut transaction)
         .await?;
 

@@ -99,13 +99,22 @@ impl Compiler {
         };
 
         let cp = CompiledPolicy::new(compiled_actions, compiled_resources, conditions);
-        if ! id.is_empty() {
-            self.cache.insert(id, cp.clone())
+        if !id.is_empty() {
+            self.cache
+                .insert(id, cp.clone())
                 .map_err(|err| {
-                    warn!(r#"Compiled policy "{}" failed to be stored in cache: {}"#, id, err.to_string());
+                    warn!(
+                        r#"Compiled policy "{}" failed to be stored in cache: {}"#,
+                        id,
+                        err.to_string()
+                    );
                     err
                 })
-                .and_then(|res| { trace!(r#"Compiled policy "{}" successfully stored in cache"#, id); Ok(()) });
+                .and_then(|_| {
+                    trace!(r#"Compiled policy "{}" successfully stored in cache"#, id);
+                    Ok(())
+                })
+                .ok();
         }
 
         debug!("Compiled policy with id {}", id);

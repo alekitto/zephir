@@ -6,6 +6,9 @@ use std::collections::hash_set::Iter;
 pub trait Subject: Role + ToJson {
     /// Returns the inline policy associate with the subject.
     fn get_inline_policy(&self) -> Option<&CompletePolicy>;
+
+    /// Borrows a mutable reference to the inline policy.
+    fn get_inline_policy_mut(&mut self) -> Option<&mut CompletePolicy>;
 }
 
 pub(crate) struct SubjectIterator<'a, T: Subject> {

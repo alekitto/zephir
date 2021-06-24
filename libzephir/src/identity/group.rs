@@ -235,6 +235,10 @@ impl Subject for Group {
     fn get_inline_policy(&self) -> Option<&CompletePolicy> {
         self.inline_policy.as_ref()
     }
+
+    fn get_inline_policy_mut(&mut self) -> Option<&mut CompletePolicy> {
+        self.inline_policy.as_mut()
+    }
 }
 
 impl Role for Group {

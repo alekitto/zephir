@@ -70,7 +70,7 @@ pub(crate) async fn upsert_group(
         };
     }
 
-    storage.save_group(&group).await?;
+    storage.save_group(&mut group).await?;
     Ok(HttpResponse::Ok().json(group.to_json()))
 }
 
@@ -120,12 +120,12 @@ pub(crate) async fn patch_group_identities(
                     Option::None => Err(ZephirError::NotFound),
                     Option::Some(identity) => {
                         group = group.add_identity(identity);
-                        Ok(storage.save_group(&group).await?)
+                        Ok(storage.save_group(&mut group).await?)
                     }
                 },
                 PatchOperation::Remove => {
                     group = group.remove_identity(&info.identity);
-                    Ok(storage.save_group(&group).await?)
+                    Ok(storage.save_group(&mut group).await?)
                 }
             }?;
 

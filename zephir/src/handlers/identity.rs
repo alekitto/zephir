@@ -39,7 +39,7 @@ pub(crate) async fn upsert_identity(
         };
     }
 
-    storage.save_identity(&identity).await?;
+    storage.save_identity(&mut identity).await?;
     Ok(HttpResponse::Ok().json(identity.to_json()))
 }
 
