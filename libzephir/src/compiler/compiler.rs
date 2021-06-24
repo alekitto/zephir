@@ -102,6 +102,9 @@ impl Compiler {
         if !id.is_empty() {
             self.cache
                 .insert(id, cp.clone())
+                .map(|_| {
+                    trace!(r#"Compiled policy "{}" successfully stored in cache"#, id);
+                })
                 .map_err(|err| {
                     warn!(
                         r#"Compiled policy "{}" failed to be stored in cache: {}"#,
@@ -109,10 +112,6 @@ impl Compiler {
                         err.to_string()
                     );
                     err
-                })
-                .and_then(|_| {
-                    trace!(r#"Compiled policy "{}" successfully stored in cache"#, id);
-                    Ok(())
                 })
                 .ok();
         }
