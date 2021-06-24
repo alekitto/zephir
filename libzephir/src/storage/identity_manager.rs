@@ -64,6 +64,11 @@ impl StorageManager {
             embedded_policy.id = policy_id;
             self._save_policy(embedded_policy, &mut transaction).await?;
         } else {
+            sqlx::query("UPDATE identity SET policy_id = NULL WHERE id = $1")
+                .bind(&i.id)
+                .execute(&mut transaction)
+                .await?;
+
             sqlx::query("DELETE FROM policy WHERE id = $1")
                 .bind(policy_id)
                 .execute(&mut transaction)
