@@ -5,8 +5,6 @@ use serde_json::Value;
 use std::convert::TryFrom;
 use std::sync::Once;
 
-const V8_INIT: Once = Once::new();
-
 macro_rules! wrap_script {
     ($code: expr) => {{
         format!(
@@ -30,12 +28,6 @@ where
     's: 'i,
 {
     fn new(isolate_scope: &'i mut v8::HandleScope<'s, ()>) -> Self {
-        V8_INIT.call_once(|| {
-            let p = v8::new_default_platform().unwrap();
-            v8::V8::initialize_platform(p);
-            v8::V8::initialize();
-        });
-
         let global = v8::ObjectTemplate::new(isolate_scope);
         let context = v8::Context::new_from_template(isolate_scope, global);
         let context_scope = v8::ContextScope::new(isolate_scope, context);
@@ -135,8 +127,14 @@ pub(super) fn make_script(value: &Value) -> Result<Condition, Error> {
         .map(|s| Condition::Script(String::from(s)))
 }
 
-#[inline]
 pub(super) fn evaluate_script(script: &str, params: &Value) -> bool {
+    static V8_INIT: Once = Once::new();
+    V8_INIT.call_once(|| {
+        let p = v8::new_default_platform().unwrap();
+        v8::V8::initialize_platform(p);
+        v8::V8::initialize();
+    });
+
     let mut isolate = v8::Isolate::new(v8::CreateParams::default());
     let mut isolate_scope = v8::HandleScope::new(&mut isolate);
 
@@ -146,12 +144,10 @@ pub(super) fn evaluate_script(script: &str, params: &Value) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use crate::policy::condition::initialize_v8_platform;
     use crate::policy::condition::script::evaluate_script;
 
     #[test]
     fn should_correctly_evaluate_script() {
-        initialize_v8_platform().expect("");
         let result = evaluate_script(
             r#"
 let source = request.source;
@@ -167,8 +163,6 @@ return source === 'CorrectSource';
 
     #[test]
     fn should_convert_returned_value_into_a_boolean() {
-        initialize_v8_platform().expect("");
-
         let result = evaluate_script(r#"return 1;"#, &serde_json::json!({}));
         assert_eq!(true, result);
 
@@ -181,8 +175,6 @@ return source === 'CorrectSource';
 
     #[test]
     fn should_return_false_in_case_of_error() {
-        initialize_v8_platform().expect("");
-
         let result = evaluate_script(r#"throw new Error();"#, &serde_json::json!({}));
         assert_eq!(false, result);
     }

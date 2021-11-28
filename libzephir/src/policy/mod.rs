@@ -129,7 +129,7 @@ mod tests {
         use std::convert::TryFrom;
         assert_eq!(
             PolicyVersion::try_from(-1).unwrap_err().to_string(),
-            "Unknown policy version"
+            r#"Unknown policy version "-1""#
         );
     }
 
