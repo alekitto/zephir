@@ -105,9 +105,9 @@ impl PartialPolicy {
     }
 }
 
-impl Into<Value> for PartialPolicy {
-    fn into(self) -> Value {
-        self.to_value()
+impl From<PartialPolicy> for Value {
+    fn from(policy: PartialPolicy) -> Self {
+        policy.to_value()
     }
 }
 

@@ -3,20 +3,9 @@ use crate::policy::condition::Condition;
 use rusty_v8 as v8;
 use serde_json::Value;
 use std::convert::TryFrom;
+use std::sync::Once;
 
-lazy_static! {
-    static ref INITIALIZED: bool = {
-        let p = v8::new_default_platform().unwrap();
-        v8::V8::initialize_platform(p);
-        v8::V8::initialize();
-
-        true
-    };
-}
-
-pub(crate) fn initialize_v8_platform() -> Result<bool, Error> {
-    Ok(*INITIALIZED)
-}
+const V8_INIT: Once = Once::new();
 
 macro_rules! wrap_script {
     ($code: expr) => {{
@@ -41,6 +30,12 @@ where
     's: 'i,
 {
     fn new(isolate_scope: &'i mut v8::HandleScope<'s, ()>) -> Self {
+        V8_INIT.call_once(|| {
+            let p = v8::new_default_platform().unwrap();
+            v8::V8::initialize_platform(p);
+            v8::V8::initialize();
+        });
+
         let global = v8::ObjectTemplate::new(isolate_scope);
         let context = v8::Context::new_from_template(isolate_scope, global);
         let context_scope = v8::ContextScope::new(isolate_scope, context);
@@ -93,7 +88,7 @@ where
                 )
             })?;
 
-        let params = self.value_to_v8_object(&params);
+        let params = self.value_to_v8_object(params);
         let key = v8::String::new(&mut self.context_scope, "request").unwrap();
         self.context.global(&mut self.context_scope).set(
             &mut self.context_scope,

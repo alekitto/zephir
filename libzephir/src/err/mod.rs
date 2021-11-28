@@ -90,7 +90,7 @@ struct UnknownPolicyVersionError {
 
 impl fmt::Display for UnknownPolicyVersionError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Unknown policy version")
+        write!(f, r#"Unknown policy version "{}""#, self.version)
     }
 }
 

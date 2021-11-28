@@ -91,7 +91,7 @@ impl ToJson for Identity {
             Value::from(
                 linked_policies
                     .into_iter()
-                    .map(|ref p| p.id.as_str())
+                    .map(|p| p.id.as_str())
                     .collect::<Vec<&str>>(),
             ),
         );
@@ -100,9 +100,9 @@ impl ToJson for Identity {
     }
 }
 
-impl Into<Value> for Identity {
-    fn into(self) -> Value {
-        Value::Object(self.to_json())
+impl From<Identity> for Value {
+    fn from(identity: Identity) -> Self {
+        Value::Object(identity.to_json())
     }
 }
 

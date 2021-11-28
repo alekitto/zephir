@@ -49,8 +49,18 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
     libzephir::initialize_libzephir();
 
+    let min_connections: u32 = std::env::var("MINCONN")
+        .unwrap_or_else(|_| "0".to_string())
+        .parse()
+        .unwrap();
+    let max_connections: u32 = std::env::var("MAXCONN")
+        .unwrap_or_else(|_| "5".to_string())
+        .parse()
+        .unwrap();
+
     let pool = PgPoolOptions::new()
-        .max_connections(5)
+        .min_connections(min_connections)
+        .max_connections(max_connections)
         .connect(get_db_connection_string().unwrap().as_str())
         .await
         .unwrap();

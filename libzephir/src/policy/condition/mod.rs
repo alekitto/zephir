@@ -9,8 +9,6 @@ mod script;
 mod string_equals;
 mod string_not_equals;
 
-pub(crate) use script::initialize_v8_platform;
-
 use crate::err::{Error, ErrorKind};
 use crate::policy::condition::binary_compare::{
     eval_value_binary_equals, evaluate_binary_equals, make_binary_equals,

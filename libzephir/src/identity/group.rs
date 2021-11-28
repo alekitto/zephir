@@ -197,9 +197,9 @@ impl PolicySetTrait<CompletePolicy> for Group {
     }
 }
 
-impl Into<Value> for Group {
-    fn into(self) -> Value {
-        Value::Object(self.to_json())
+impl From<Group> for Value {
+    fn from(group: Group) -> Self {
+        Value::Object(group.to_json())
     }
 }
 
@@ -222,7 +222,7 @@ impl ToJson for Group {
             Value::from(
                 linked_policies
                     .into_iter()
-                    .map(|ref p| p.id.as_str())
+                    .map(|p| p.id.as_str())
                     .collect::<Vec<&str>>(),
             ),
         );
