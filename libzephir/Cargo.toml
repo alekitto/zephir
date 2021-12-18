@@ -2,7 +2,7 @@
 name = "libzephir"
 version = "0.1.0"
 authors = ["Alessandro Chitolina <alekitto@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 base64 = "0.13"
