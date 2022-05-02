@@ -26,7 +26,7 @@ enum PatchOperation {
     Remove,
 }
 
-impl Deserialize<'de> for PatchOperation {
+impl<'de> Deserialize<'de> for PatchOperation {
     fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
     where
         D: Deserializer<'de>,
