@@ -1,7 +1,6 @@
 use crate::err::ZephirError;
 use crate::handlers::policy::InlinePolicy;
 use actix_web::{get, patch, post, web, HttpResponse};
-use actix_web_validator::Validate;
 use libzephir::identity::group::Group;
 use libzephir::policy::policy::{CompletePolicy, ToJson};
 use libzephir::policy::policy_set::PolicySetTrait;
@@ -9,6 +8,7 @@ use libzephir::storage::StorageManager;
 use serde::de::Unexpected;
 use serde::{Deserialize, Deserializer};
 use std::convert::TryFrom;
+use validator::Validate;
 
 #[derive(Debug, Deserialize, Validate)]
 pub(crate) struct UpsertGroupRequest {
@@ -76,9 +76,10 @@ pub(crate) async fn upsert_group(
 
 #[get("/group/{id}")]
 pub(crate) async fn get_group(
-    web::Path(id): web::Path<String>,
+    path: web::Path<String>,
     storage: web::Data<StorageManager>,
 ) -> Result<HttpResponse, ZephirError> {
+    let id = path.into_inner();
     let result = storage.find_group(id).await?;
     match result {
         Option::None => Err(ZephirError::NotFound),
@@ -88,9 +89,10 @@ pub(crate) async fn get_group(
 
 #[get("/group/{id}/identities")]
 pub(crate) async fn get_group_identities(
-    web::Path(id): web::Path<String>,
+    path: web::Path<String>,
     storage: web::Data<StorageManager>,
 ) -> Result<HttpResponse, ZephirError> {
+    let id = path.into_inner();
     let result = storage.find_group(id).await?;
     match result {
         Option::None => Err(ZephirError::NotFound),
@@ -108,9 +110,10 @@ pub(crate) async fn get_group_identities(
 #[patch("/group/{id}/identities")]
 pub(crate) async fn patch_group_identities(
     info: web::Json<PatchGroupIdentitiesRequest>,
-    web::Path(id): web::Path<String>,
+    path: web::Path<String>,
     storage: web::Data<StorageManager>,
 ) -> Result<HttpResponse, ZephirError> {
+    let id = path.into_inner();
     let result = storage.find_group(id).await?;
     match result {
         Option::None => Err(ZephirError::NotFound),

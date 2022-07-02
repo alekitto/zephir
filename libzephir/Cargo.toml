@@ -7,18 +7,21 @@ edition = "2021"
 [dependencies]
 base64 = "0.13"
 bitflags = "1.2"
-cidr = "0.1"
 lazy_static = "1.4"
 log = "0.4"
 mouscache = "0.5"
 num-traits = "0.2"
 pcre2 = "0.2"
 serde = "1.0"
-redis = "0.10"
-rusty_v8 = "0.22"
+redis = "0.21"
+rusty_v8 = "0.32"
 
 [dependencies.chrono]
 version = "0.4"
+features = ["default", "serde"]
+
+[dependencies.cidr]
+version = "0.2"
 features = ["serde"]
 
 [dependencies.serde_json]

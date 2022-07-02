@@ -1,7 +1,7 @@
 use crate::err::ZephirError;
 use crate::handlers::policy::InlinePolicy;
 use actix_web::{get, post, web, HttpResponse};
-use actix_web_validator::Validate;
+use validator::Validate;
 use libzephir::identity::identity::Identity;
 use libzephir::policy::policy::{CompletePolicy, ToJson};
 use libzephir::policy::policy_set::PolicySetTrait;
@@ -45,9 +45,10 @@ pub(crate) async fn upsert_identity(
 
 #[get("/identity/{id}")]
 pub(crate) async fn get_identity(
-    web::Path(id): web::Path<String>,
+    path: web::Path<String>,
     storage: web::Data<StorageManager>,
 ) -> Result<HttpResponse, ZephirError> {
+    let id = path.into_inner();
     let result = storage.find_identity(id).await?;
     match result {
         Option::None => Err(ZephirError::NotFound),

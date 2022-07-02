@@ -1,6 +1,6 @@
 use crate::err::ZephirError;
 use actix_web::{get, post, web, HttpResponse};
-use actix_web_validator::Validate;
+use validator::Validate;
 use libzephir::err::Error;
 use libzephir::policy::policy::{CompletePolicy, ToJson};
 use libzephir::policy::{PolicyEffect, PolicyVersion};
@@ -116,9 +116,10 @@ pub(crate) async fn upsert_policy(
 
 #[get("/policy/{id}")]
 pub(crate) async fn get_policy(
-    web::Path(id): web::Path<String>,
+    path: web::Path<String>,
     storage: web::Data<StorageManager>,
 ) -> Result<HttpResponse, ZephirError> {
+    let id = path.into_inner();
     let result = storage.find_policy(id).await?;
     match result {
         Option::None => Err(ZephirError::NotFound),

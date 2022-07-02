@@ -1,4 +1,3 @@
-#![feature(once_cell)]
 #![feature(hash_drain_filter)]
 
 #[macro_use]

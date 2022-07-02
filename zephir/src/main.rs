@@ -6,6 +6,7 @@ mod handlers;
 
 use actix_web::middleware::Logger;
 use actix_web::{App, HttpServer};
+use actix_web::web::Data;
 use libzephir::err::{Error, ErrorKind};
 use libzephir::storage::StorageManager;
 use sqlx::postgres::PgPoolOptions;
@@ -68,8 +69,8 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .data(pool.clone())
-            .data(storage_manager.clone())
+            .app_data(Data::new(pool.clone()))
+            .app_data(Data::new(storage_manager.clone()))
             .wrap(Logger::default())
             .service(handlers::get_status)
             .service(handlers::allowed_action)

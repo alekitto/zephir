@@ -130,7 +130,7 @@ pub(super) fn make_script(value: &Value) -> Result<Condition, Error> {
 pub(super) fn evaluate_script(script: &str, params: &Value) -> bool {
     static V8_INIT: Once = Once::new();
     V8_INIT.call_once(|| {
-        let p = v8::new_default_platform().unwrap();
+        let p = v8::new_default_platform(0, true).make_shared();
         v8::V8::initialize_platform(p);
         v8::V8::initialize();
     });

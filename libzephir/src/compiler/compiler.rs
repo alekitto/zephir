@@ -4,10 +4,12 @@ use crate::policy::condition::Condition;
 use crate::utils::glob_to_regex;
 use log::{debug, log_enabled, trace, warn, Level};
 use mouscache::{Cache, CacheError};
-use std::lazy::SyncLazy;
+use lazy_static::lazy_static;
 use std::ops::Deref;
 
-static COMPILER: SyncLazy<Compiler> = SyncLazy::new(|| Compiler::new(create_cache()));
+lazy_static! {
+    static ref COMPILER: Compiler = Compiler::new(create_cache());
+}
 
 pub(crate) mod cache {
     use crate::compiler::compiled_policy::CompiledPolicy;
