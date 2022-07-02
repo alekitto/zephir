@@ -3,7 +3,7 @@ FROM rustlang/rust:nightly-buster as builder
 WORKDIR app
 COPY . .
 
-RUN cargo fetch --locked
+RUN CARGO_NET_GIT_FETCH_WITH_CLI=true cargo fetch --locked
 RUN cargo build --release
 
 FROM bitnami/minideb:buster as runtime
