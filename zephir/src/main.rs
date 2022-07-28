@@ -4,12 +4,16 @@ extern crate lazy_static;
 mod err;
 mod handlers;
 
+use std::process::exit;
 use actix_web::middleware::Logger;
-use actix_web::{App, HttpServer};
+use actix_web::rt::time::sleep;
 use actix_web::web::Data;
+use actix_web::{App, HttpServer};
 use libzephir::err::{Error, ErrorKind};
 use libzephir::storage::StorageManager;
+use log::{debug, error};
 use sqlx::postgres::PgPoolOptions;
+use std::time::Duration;
 
 fn get_serve_port() -> u16 {
     let serve_port = std::env::var("SERVE_PORT");
@@ -58,12 +62,37 @@ async fn main() -> std::io::Result<()> {
         .parse()
         .unwrap();
 
-    let pool = PgPoolOptions::new()
-        .min_connections(min_connections)
-        .max_connections(max_connections)
-        .connect(get_db_connection_string().unwrap().as_str())
-        .await
-        .unwrap();
+    let db_conn_string = get_db_connection_string();
+    if let Err(e) = db_conn_string {
+        error!("{}", e.to_string());
+        exit(1);
+    }
+
+    let pool = async {
+        let conn;
+        loop {
+            debug!("Connecting to database...");
+            let connection = PgPoolOptions::new()
+                .min_connections(min_connections)
+                .max_connections(max_connections)
+                .connect(get_db_connection_string().unwrap().as_str())
+                .await;
+
+            if let Ok(c) = connection {
+                conn = Some(c);
+                break;
+            }
+
+            error!(
+                "Connection failed: {:#?}. Retrying...",
+                connection.err().unwrap()
+            );
+            sleep(Duration::from_secs(1)).await;
+        }
+
+        conn.unwrap()
+    }
+    .await;
 
     let storage_manager = StorageManager::new(pool.clone());
 

@@ -1,6 +1,5 @@
 use crate::err::ZephirError;
 use actix_web::{get, post, web, HttpResponse};
-use validator::Validate;
 use libzephir::err::Error;
 use libzephir::policy::policy::{CompletePolicy, ToJson};
 use libzephir::policy::{PolicyEffect, PolicyVersion};
@@ -9,6 +8,7 @@ use regex::Regex;
 use serde::Deserialize;
 use serde_json::Value;
 use std::convert::TryFrom;
+use validator::Validate;
 
 lazy_static! {
     static ref RE_VALID_ID: Regex = Regex::new(r"^[A-Za-z][A-Za-z0-9_\-.]*$").unwrap();

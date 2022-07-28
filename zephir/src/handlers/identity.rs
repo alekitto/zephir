@@ -1,13 +1,13 @@
 use crate::err::ZephirError;
 use crate::handlers::policy::InlinePolicy;
 use actix_web::{get, post, web, HttpResponse};
-use validator::Validate;
 use libzephir::identity::identity::Identity;
 use libzephir::policy::policy::{CompletePolicy, ToJson};
 use libzephir::policy::policy_set::PolicySetTrait;
 use libzephir::storage::StorageManager;
 use serde::Deserialize;
 use std::convert::TryFrom;
+use validator::Validate;
 
 #[derive(Debug, Deserialize, Validate)]
 pub(crate) struct UpsertIdentityRequest {

@@ -2,9 +2,9 @@ use crate::cache::create_cache;
 use crate::compiler::compiled_policy::CompiledPolicy;
 use crate::policy::condition::Condition;
 use crate::utils::glob_to_regex;
+use lazy_static::lazy_static;
 use log::{debug, log_enabled, trace, warn, Level};
 use mouscache::{Cache, CacheError};
-use lazy_static::lazy_static;
 use std::ops::Deref;
 
 lazy_static! {
