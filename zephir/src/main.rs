@@ -61,6 +61,10 @@ async fn main() -> std::io::Result<()> {
         .unwrap_or_else(|_| "5".to_string())
         .parse()
         .unwrap();
+    let connection_timeout: u64 = std::env::var("CONNECTION_TIMEOUT")
+        .unwrap_or_else(|_| "500".to_string())
+        .parse()
+        .unwrap();
 
     let db_conn_string = get_db_connection_string();
     if let Err(e) = db_conn_string {
@@ -75,6 +79,7 @@ async fn main() -> std::io::Result<()> {
             let connection = PgPoolOptions::new()
                 .min_connections(min_connections)
                 .max_connections(max_connections)
+                .connect_timeout(Duration::from_millis(connection_timeout))
                 .connect(get_db_connection_string().unwrap().as_str())
                 .await;
 
